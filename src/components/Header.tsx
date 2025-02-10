@@ -1,6 +1,7 @@
 
-import { Bell, User } from "lucide-react";
+import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { NotificationBell } from "./NotificationBell";
 
 const Header = () => {
   return (
@@ -10,10 +11,7 @@ const Header = () => {
           <span className="text-emergency font-bold text-2xl">EchoLink</span>
         </div>
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-0 right-0 h-2 w-2 bg-emergency rounded-full" />
-          </Button>
+          <NotificationBell />
           <Button className="flex items-center gap-2">
             <User className="h-4 w-4" />
             <span>Connexion</span>
