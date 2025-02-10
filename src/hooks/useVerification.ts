@@ -15,11 +15,16 @@ export const useVerification = (user: User | null) => {
 
   const fetchVerificationStatus = async () => {
     try {
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
+
       const { data: verificationData, error } = await supabase
         .from("verification_documents")
         .select("*")
-        .eq("user_id", user?.id)
-        .single();
+        .eq("user_id", user.id)
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -142,6 +147,8 @@ export const useVerification = (user: User | null) => {
   useEffect(() => {
     if (user) {
       fetchVerificationStatus();
+    } else {
+      setIsLoading(false);
     }
   }, [user]);
 
