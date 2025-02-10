@@ -17,11 +17,15 @@ export const submitReview = async (
   rating: number,
   comment?: string
 ) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User must be authenticated to submit a review');
+
   const { data, error } = await supabase
     .from('reviews')
     .insert({
       volunteer_id: volunteerId,
       report_id: reportId,
+      reviewer_id: user.id,
       rating,
       comment,
     })
@@ -87,3 +91,4 @@ export const deleteReview = async (reviewId: string) => {
 
   if (error) throw error;
 };
+

@@ -202,6 +202,7 @@ export type Database = {
           created_at: string
           id: string
           rating: number
+          report_id: string
           reviewer_id: string
           volunteer_id: string
         }
@@ -210,6 +211,7 @@ export type Database = {
           created_at?: string
           id?: string
           rating: number
+          report_id: string
           reviewer_id: string
           volunteer_id: string
         }
@@ -218,10 +220,19 @@ export type Database = {
           created_at?: string
           id?: string
           rating?: number
+          report_id?: string
           reviewer_id?: string
           volunteer_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "reviews_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "volunteer_requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       spatial_ref_sys: {
         Row: {
