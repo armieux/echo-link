@@ -6,6 +6,7 @@ import Map from "@/components/Map";
 import CommunityChat from "@/components/CommunityChat";
 import VolunteerMatching from "@/components/VolunteerMatching";
 import IdentityVerification from "@/components/IdentityVerification";
+import AIAssistant from "@/components/AIAssistant";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -87,8 +88,13 @@ const Index = () => {
               </section>
             </div>
 
-            <div className="lg:pl-8">
-              <CommunityChat />
+            <div className="lg:pl-8 space-y-8">
+              <section>
+                <AIAssistant />
+              </section>
+              <section>
+                <CommunityChat />
+              </section>
             </div>
           </div>
         </main>
