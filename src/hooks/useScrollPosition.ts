@@ -3,29 +3,40 @@ import { useEffect } from 'react';
 
 export const useScrollPosition = () => {
   useEffect(() => {
-    // Set scroll restoration to manual
-    if ('scrollRestoration' in history) {
-      history.scrollRestoration = 'manual';
-    }
-
-    // Only restore scroll position if there's a saved position
-    const savedScrollPos = sessionStorage.getItem('scrollPosition');
-    if (savedScrollPos !== null) {
-      requestAnimationFrame(() => {
-        window.scrollTo(0, parseInt(savedScrollPos));
-        sessionStorage.removeItem('scrollPosition');
-      });
-    }
-
-    // Save scroll position before unload
+    // Save scroll position right before any navigation/refresh
     const handleBeforeUnload = () => {
       sessionStorage.setItem('scrollPosition', window.scrollY.toString());
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    // Restore scroll position after the page content is loaded
+    const restoreScrollPosition = () => {
+      const savedPosition = sessionStorage.getItem('scrollPosition');
+      if (savedPosition !== null) {
+        // Use requestAnimationFrame to ensure DOM is ready
+        requestAnimationFrame(() => {
+          window.scrollTo({
+            top: parseInt(savedPosition),
+            behavior: 'instant'
+          });
+          // Clear the saved position after restoration
+          sessionStorage.removeItem('scrollPosition');
+        });
+      }
+    };
 
+    // Set browser's scroll restoration to manual
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    // Add event listeners
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('load', restoreScrollPosition);
+
+    // Cleanup
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('load', restoreScrollPosition);
     };
   }, []);
 };
