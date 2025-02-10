@@ -158,7 +158,6 @@ export type Database = {
           description: string
           id: string
           latitude: number
-          location: unknown | null
           longitude: number
           priority: number
           required_skills: string[] | null
@@ -172,7 +171,6 @@ export type Database = {
           description: string
           id?: string
           latitude: number
-          location?: unknown | null
           longitude: number
           priority: number
           required_skills?: string[] | null
@@ -186,7 +184,6 @@ export type Database = {
           description?: string
           id?: string
           latitude?: number
-          location?: unknown | null
           longitude?: number
           priority?: number
           required_skills?: string[] | null
