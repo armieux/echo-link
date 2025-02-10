@@ -1,4 +1,3 @@
-
 import Header from "@/components/Header";
 import EmergencyButton from "@/components/EmergencyButton";
 import ResourceCard from "@/components/ResourceCard";
@@ -9,6 +8,7 @@ import IdentityVerification from "@/components/IdentityVerification";
 import AIAssistant from "@/components/AIAssistant";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useScrollPosition } from "@/hooks/useScrollPosition";
 
 const resources = [
   {
@@ -30,6 +30,7 @@ const resources = [
 
 const Index = () => {
   const [latestReportId, setLatestReportId] = useState<string | null>(null);
+  useScrollPosition();
 
   useEffect(() => {
     const fetchLatestReport = async () => {

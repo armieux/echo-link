@@ -152,7 +152,7 @@ const Map = () => {
   }, [reports]);
 
   return (
-    <div className="relative w-full h-[500px] bg-gray-100 rounded-lg overflow-hidden">
+    <div className="relative w-full h-[600px] bg-gray-100 rounded-lg overflow-hidden">
       <div ref={mapContainer} className="absolute inset-0" />
       
       {/* Floating Action Button to show/hide form */}
@@ -164,11 +164,11 @@ const Map = () => {
         <span className="ml-2">Nouveau signalement</span>
       </Button>
 
-      {/* Emergency Form Modal */}
+      {/* Emergency Form Modal with reduced size */}
       {showForm && (
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <EmergencyForm />
+          <div className="w-full max-w-md max-h-[80vh] bg-white rounded-lg shadow-xl overflow-y-auto">
+            <EmergencyForm onClose={() => setShowForm(false)} />
           </div>
         </div>
       )}
