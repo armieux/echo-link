@@ -21,9 +21,7 @@ const IdentityVerification = () => {
   const [selfie, setSelfie] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [verificationStatus, setVerificationStatus] = useState<
-    "pending" | "verified" | "rejected" | "unverified"
-  >("unverified");
+  const [verificationStatus, setVerificationStatus] = useState<"pending" | "verified" | "rejected">("pending");
   const [verificationDoc, setVerificationDoc] = useState<VerificationDocument | null>(null);
   const { user } = useAuth();
 
