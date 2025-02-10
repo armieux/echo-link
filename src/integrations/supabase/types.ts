@@ -78,8 +78,10 @@ export type Database = {
           description: string
           id: string
           latitude: number
+          location: unknown | null
           longitude: number
           priority: number
+          required_skills: string[] | null
           status: string | null
           title: string
           user_id: string
@@ -90,8 +92,10 @@ export type Database = {
           description: string
           id?: string
           latitude: number
+          location?: unknown | null
           longitude: number
           priority: number
+          required_skills?: string[] | null
           status?: string | null
           title: string
           user_id: string
@@ -102,8 +106,10 @@ export type Database = {
           description?: string
           id?: string
           latitude?: number
+          location?: unknown | null
           longitude?: number
           priority?: number
+          required_skills?: string[] | null
           status?: string | null
           title?: string
           user_id?: string

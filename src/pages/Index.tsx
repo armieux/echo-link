@@ -6,6 +6,8 @@ import Map from "@/components/Map";
 import ChatSidebar from "@/components/ChatSidebar";
 import VolunteerMatching from "@/components/VolunteerMatching";
 import IdentityVerification from "@/components/IdentityVerification";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const resources = [
   {
@@ -26,6 +28,25 @@ const resources = [
 ];
 
 const Index = () => {
+  const [latestReportId, setLatestReportId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchLatestReport = async () => {
+      const { data, error } = await supabase
+        .from('reports')
+        .select('id')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (data && !error) {
+        setLatestReportId(data.id);
+      }
+    };
+
+    fetchLatestReport();
+  }, []);
+
   return (
     <div className="min-h-screen flex">
       <div className="flex-1 overflow-y-auto">
@@ -44,9 +65,11 @@ const Index = () => {
             <Map />
           </section>
 
-          <section className="mb-16">
-            <VolunteerMatching />
-          </section>
+          {latestReportId && (
+            <section className="mb-16">
+              <VolunteerMatching reportId={latestReportId} />
+            </section>
+          )}
 
           <section className="mb-16">
             <IdentityVerification />
