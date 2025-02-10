@@ -17,6 +17,10 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
+interface EmergencyFormProps {
+  onClose?: () => void;
+}
+
 const EMERGENCY_CATEGORIES = [
   { id: "water", label: "Eau potable" },
   { id: "car", label: "Panne de voiture" },
@@ -25,7 +29,7 @@ const EMERGENCY_CATEGORIES = [
   { id: "other", label: "Autre" },
 ];
 
-const EmergencyForm = () => {
+const EmergencyForm = ({ onClose }: EmergencyFormProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
@@ -120,6 +124,11 @@ const EmergencyForm = () => {
       setCategory("");
       setPriority(50);
       setLocation(null);
+      
+      // Close the form if onClose prop is provided
+      if (onClose) {
+        onClose();
+      }
     } catch (error) {
       console.error('Error creating report:', error);
       toast({
