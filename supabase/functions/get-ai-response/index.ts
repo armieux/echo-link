@@ -17,6 +17,14 @@ serve(async (req) => {
   try {
     const { message } = await req.json();
 
+    if (!message) {
+      throw new Error('Message is required');
+    }
+
+    if (!openAIApiKey) {
+      throw new Error('GROQ_API_KEY is not configured');
+    }
+
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -42,9 +50,19 @@ serve(async (req) => {
       }),
     });
 
-    console.log('OpenAI response:', response);
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Groq API error:', errorData);
+      throw new Error('Failed to get response from Groq API');
+    }
 
     const data = await response.json();
+    
+    if (!data || !data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Invalid response structure:', data);
+      throw new Error('Invalid response structure from Groq API');
+    }
+
     const generatedText = data.choices[0].message.content;
 
     return new Response(JSON.stringify({ generatedText }), {
@@ -52,9 +70,14 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error('Error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ 
+        error: error.message || 'Une erreur est survenue lors de la génération de la réponse'
+      }), 
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   }
 });
