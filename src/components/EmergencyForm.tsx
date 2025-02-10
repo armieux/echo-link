@@ -71,8 +71,7 @@ const EmergencyForm = ({ onClose }: EmergencyFormProps) => {
             description,
             category,
             priority,
-            latitude: location.lat,
-            longitude: location.lng,
+            location: `POINT(${location.lng} ${location.lat})`,
             user_id: user.id
           }
         ]);
