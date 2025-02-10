@@ -13,6 +13,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/auth/Auth";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/auth/ResetPassword";
+import EmergencyResources from "./pages/resources/EmergencyResources";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,14 @@ const App = () => (
                     element={
                       <ProtectedRoute>
                         <Index />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/resources"
+                    element={
+                      <ProtectedRoute>
+                        <EmergencyResources />
                       </ProtectedRoute>
                     }
                   />
