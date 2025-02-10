@@ -5,11 +5,16 @@ interface ResourceCardProps {
   title: string;
   description: string;
   imageUrl: string;
+  link?: string;
+  onClick?: () => void;
 }
 
-const ResourceCard = ({ title, description, imageUrl }: ResourceCardProps) => {
+const ResourceCard = ({ title, description, imageUrl, onClick }: ResourceCardProps) => {
   return (
-    <Card className="overflow-hidden transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg">
+    <Card 
+      className="overflow-hidden transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg cursor-pointer"
+      onClick={onClick}
+    >
       <div className="aspect-video overflow-hidden">
         <img
           src={imageUrl}
