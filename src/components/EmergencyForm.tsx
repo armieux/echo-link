@@ -1,33 +1,20 @@
 
 import { useState } from "react";
-import { MapPin, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import EmergencyPrioritySlider from "./emergency/EmergencyPrioritySlider";
+import EmergencyLocationButton from "./emergency/EmergencyLocationButton";
+import EmergencyCategorySelect from "./emergency/EmergencyCategorySelect";
 
 interface EmergencyFormProps {
   onClose?: () => void;
 }
-
-const EMERGENCY_CATEGORIES = [
-  { id: "water", label: "Eau potable" },
-  { id: "car", label: "Panne de voiture" },
-  { id: "person", label: "Personne en difficulté" },
-  { id: "medical", label: "Urgence médicale" },
-  { id: "other", label: "Autre" },
-];
 
 const EmergencyForm = ({ onClose }: EmergencyFormProps) => {
   const [title, setTitle] = useState("");
@@ -38,41 +25,6 @@ const EmergencyForm = ({ onClose }: EmergencyFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
-
-  const handleGetLocation = () => {
-    if (!navigator.geolocation) {
-      toast({
-        variant: "destructive",
-        title: "Géolocalisation non supportée",
-        description: "Votre navigateur ne supporte pas la géolocalisation.",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLocation({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
-        toast({
-          title: "Position capturée",
-          description: "Votre position a été enregistrée avec succès.",
-        });
-        setIsLoading(false);
-      },
-      (error) => {
-        console.error("Erreur de géolocalisation:", error);
-        toast({
-          variant: "destructive",
-          title: "Erreur de géolocalisation",
-          description: "Impossible de récupérer votre position.",
-        });
-        setIsLoading(false);
-      }
-    );
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,7 +77,6 @@ const EmergencyForm = ({ onClose }: EmergencyFormProps) => {
       setPriority(50);
       setLocation(null);
       
-      // Close the form if onClose prop is provided
       if (onClose) {
         onClose();
       }
@@ -166,51 +117,22 @@ const EmergencyForm = ({ onClose }: EmergencyFormProps) => {
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="category">Catégorie</Label>
-        <Select value={category} onValueChange={setCategory} required>
-          <SelectTrigger id="category">
-            <SelectValue placeholder="Sélectionnez une catégorie" />
-          </SelectTrigger>
-          <SelectContent>
-            {EMERGENCY_CATEGORIES.map((cat) => (
-              <SelectItem key={cat.id} value={cat.id}>
-                {cat.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <EmergencyCategorySelect 
+        category={category} 
+        onCategoryChange={setCategory} 
+      />
 
-      <div className="space-y-4">
-        <Label>Niveau de priorité</Label>
-        <div className="pt-2">
-          <Slider
-            value={[priority]}
-            onValueChange={(values) => setPriority(values[0])}
-            max={100}
-            step={1}
-            className="w-full"
-          />
-          <div className="flex justify-between text-sm text-gray-500 mt-2">
-            <span>Faible</span>
-            <span>Moyenne</span>
-            <span>Haute</span>
-          </div>
-        </div>
-      </div>
+      <EmergencyPrioritySlider 
+        priority={priority} 
+        onPriorityChange={(values) => setPriority(values[0])} 
+      />
 
       <div className="flex gap-4">
-        <Button
-          type="button"
-          variant="outline"
-          className="flex-1"
-          onClick={handleGetLocation}
-          disabled={isLoading}
-        >
-          <MapPin className="mr-2" />
-          {location ? "Position capturée" : "Capturer ma position"}
-        </Button>
+        <EmergencyLocationButton
+          onLocationCaptured={setLocation}
+          isLoading={isLoading}
+          hasLocation={!!location}
+        />
       </div>
 
       <Button 
