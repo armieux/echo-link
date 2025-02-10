@@ -34,6 +34,15 @@ const IdentityVerification = () => {
   };
 
   const handleSubmit = async () => {
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Non authentifié",
+        description: "Veuillez vous connecter pour soumettre vos documents.",
+      });
+      return;
+    }
+
     if (!idDocument || !selfie) {
       toast({
         variant: "destructive",
@@ -51,15 +60,15 @@ const IdentityVerification = () => {
         uploadFile(selfie, "selfie")
       ]);
 
-      // Create verification request
+      // Create verification request with user_id
       const { error: requestError } = await supabase
         .from('verification_requests')
-        .insert([
-          {
-            id_document_path: idPath,
-            selfie_path: selfiePath,
-          }
-        ]);
+        .insert({
+          user_id: user.id,
+          id_document_path: idPath,
+          selfie_path: selfiePath,
+          status: 'pending'
+        });
 
       if (requestError) throw requestError;
       
@@ -124,3 +133,4 @@ const IdentityVerification = () => {
 };
 
 export default IdentityVerification;
+
