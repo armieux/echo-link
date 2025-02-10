@@ -4,6 +4,7 @@ import EmergencyButton from "@/components/EmergencyButton";
 import ResourceCard from "@/components/ResourceCard";
 import Map from "@/components/Map";
 import ChatSidebar from "@/components/ChatSidebar";
+import VolunteerMatching from "@/components/VolunteerMatching";
 
 const resources = [
   {
@@ -40,6 +41,10 @@ const Index = () => {
 
           <section className="mb-16">
             <Map />
+          </section>
+
+          <section className="mb-16">
+            <VolunteerMatching />
           </section>
 
           <section className="mb-16">
