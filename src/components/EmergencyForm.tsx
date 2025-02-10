@@ -4,6 +4,7 @@ import { MapPin, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -13,6 +14,8 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const EMERGENCY_CATEGORIES = [
   { id: "water", label: "Eau potable" },
@@ -23,12 +26,14 @@ const EMERGENCY_CATEGORIES = [
 ];
 
 const EmergencyForm = () => {
+  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [priority, setPriority] = useState(50);
   const [location, setLocation] = useState<{lat: number; lng: number} | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
@@ -65,7 +70,7 @@ const EmergencyForm = () => {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!location) {
       toast({
@@ -76,28 +81,70 @@ const EmergencyForm = () => {
       return;
     }
 
-    // TODO: Implement submission logic
-    console.log({
-      description,
-      category,
-      priority,
-      location,
-    });
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Non connecté",
+        description: "Vous devez être connecté pour créer un signalement.",
+      });
+      return;
+    }
 
-    toast({
-      title: "Signalement envoyé",
-      description: "Votre signalement a été transmis avec succès.",
-    });
+    setIsLoading(true);
 
-    // Reset form
-    setDescription("");
-    setCategory("");
-    setPriority(50);
-    setLocation(null);
+    try {
+      const { error } = await supabase
+        .from('reports')
+        .insert([
+          {
+            title,
+            description,
+            category,
+            priority,
+            latitude: location.lat,
+            longitude: location.lng,
+            user_id: user.id
+          }
+        ]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Signalement envoyé",
+        description: "Votre signalement a été transmis avec succès.",
+      });
+
+      // Reset form
+      setTitle("");
+      setDescription("");
+      setCategory("");
+      setPriority(50);
+      setLocation(null);
+    } catch (error) {
+      console.error('Error creating report:', error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'envoi du signalement.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 p-6 bg-white rounded-lg shadow-md">
+      <div className="space-y-2">
+        <Label htmlFor="title">Titre de l'urgence</Label>
+        <Input
+          id="title"
+          placeholder="Titre bref de la situation..."
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
+      </div>
+
       <div className="space-y-2">
         <Label htmlFor="description">Description de l'urgence</Label>
         <Textarea
@@ -157,9 +204,13 @@ const EmergencyForm = () => {
         </Button>
       </div>
 
-      <Button type="submit" className="w-full bg-emergency hover:bg-emergency/90">
+      <Button 
+        type="submit" 
+        className="w-full bg-emergency hover:bg-emergency/90"
+        disabled={isLoading}
+      >
         <Send className="mr-2" />
-        Envoyer le signalement
+        {isLoading ? "Envoi en cours..." : "Envoyer le signalement"}
       </Button>
     </form>
   );
