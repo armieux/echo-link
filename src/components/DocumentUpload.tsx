@@ -13,26 +13,48 @@ const DocumentUpload = ({ type, onUpload }: DocumentUploadProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
 
+  const validateFile = (file: File): boolean => {
+    // Check file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        variant: "destructive",
+        title: "Type de fichier non supporté",
+        description: "Veuillez télécharger une image au format JPEG ou PNG.",
+      });
+      return false;
+    }
+
+    // Check file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+      toast({
+        variant: "destructive",
+        title: "Fichier trop volumineux",
+        description: "La taille du fichier ne doit pas dépasser 5MB.",
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   const handleDrop = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
       setIsDragging(false);
 
       const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith("image/")) {
+      if (file && validateFile(file)) {
         handleFile(file);
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Type de fichier non supporté",
-          description: "Veuillez télécharger une image.",
-        });
       }
     },
     [onUpload]
   );
 
   const handleFile = (file: File) => {
+    if (!validateFile(file)) return;
+
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreview(reader.result as string);
@@ -55,7 +77,7 @@ const DocumentUpload = ({ type, onUpload }: DocumentUploadProps) => {
     >
       <input
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png"
         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         onChange={(e) => {
           const file = e.target.files?.[0];

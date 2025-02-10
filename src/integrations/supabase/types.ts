@@ -247,6 +247,42 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_requests: {
+        Row: {
+          created_at: string
+          id: string
+          id_document_path: string | null
+          rejection_reason: string | null
+          reviewer_id: string | null
+          selfie_path: string | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          id_document_path?: string | null
+          rejection_reason?: string | null
+          reviewer_id?: string | null
+          selfie_path?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          id_document_path?: string | null
+          rejection_reason?: string | null
+          reviewer_id?: string | null
+          selfie_path?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       volunteer_requests: {
         Row: {
           created_at: string
