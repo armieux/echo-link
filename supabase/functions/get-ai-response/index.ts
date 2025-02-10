@@ -42,6 +42,8 @@ serve(async (req) => {
       }),
     });
 
+    console.log('OpenAI response:', response);
+
     const data = await response.json();
     const generatedText = data.choices[0].message.content;
 
