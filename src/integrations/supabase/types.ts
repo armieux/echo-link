@@ -116,23 +116,38 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          document_submission_date: string | null
           id: string
+          is_verified: boolean | null
+          rating: number | null
           updated_at: string
           username: string | null
+          verification_documents: Json | null
+          verification_status: string | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          document_submission_date?: string | null
           id: string
+          is_verified?: boolean | null
+          rating?: number | null
           updated_at?: string
           username?: string | null
+          verification_documents?: Json | null
+          verification_status?: string | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          document_submission_date?: string | null
           id?: string
+          is_verified?: boolean | null
+          rating?: number | null
           updated_at?: string
           username?: string | null
+          verification_documents?: Json | null
+          verification_status?: string | null
         }
         Relationships: []
       }
@@ -178,6 +193,33 @@ export type Database = {
           status?: string | null
           title?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          rating: number
+          reviewer_id: string
+          volunteer_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          reviewer_id: string
+          volunteer_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          reviewer_id?: string
+          volunteer_id?: string
         }
         Relationships: []
       }
@@ -1133,6 +1175,12 @@ export type Database = {
           "": number
         }
         Returns: string
+      }
+      get_volunteer_rating: {
+        Args: {
+          volunteer_uuid: string
+        }
+        Returns: number
       }
       gettransactionid: {
         Args: Record<PropertyKey, never>
