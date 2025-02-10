@@ -14,6 +14,9 @@ import Auth from "./pages/auth/Auth";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/auth/ResetPassword";
 import EmergencyResources from "./pages/resources/EmergencyResources";
+import RecoveryPosition from "./pages/resources/first-aid/RecoveryPosition";
+import CPR from "./pages/resources/first-aid/CPR";
+import BleedingControl from "./pages/resources/first-aid/BleedingControl";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +46,30 @@ const App = () => (
                     element={
                       <ProtectedRoute>
                         <EmergencyResources />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/resources/first-aid/recovery-position"
+                    element={
+                      <ProtectedRoute>
+                        <RecoveryPosition />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/resources/first-aid/cpr"
+                    element={
+                      <ProtectedRoute>
+                        <CPR />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/resources/first-aid/bleeding-control"
+                    element={
+                      <ProtectedRoute>
+                        <BleedingControl />
                       </ProtectedRoute>
                     }
                   />
