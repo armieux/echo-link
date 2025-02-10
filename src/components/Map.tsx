@@ -23,6 +23,24 @@ const Map = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [reports, setReports] = useState<Report[]>([]);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // Handle click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        setShowForm(false);
+      }
+    };
+
+    if (showForm) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showForm]);
 
   // Initialize map
   useEffect(() => {
@@ -167,7 +185,7 @@ const Map = () => {
       {/* Emergency Form Modal with reduced size */}
       {showForm && (
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-md max-h-[80vh] bg-white rounded-lg shadow-xl overflow-y-auto">
+          <div ref={modalRef} className="w-full max-w-md max-h-[80vh] bg-white rounded-lg shadow-xl overflow-y-auto">
             <EmergencyForm onClose={() => setShowForm(false)} />
           </div>
         </div>
