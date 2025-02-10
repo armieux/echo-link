@@ -125,7 +125,7 @@ export default function CommunityChat() {
         />
       </div>
 
-      <MessageList messages={messages} />
+      <MessageList messages={messages} shoulScroll={true} />
 
       <MessageInput
         newMessage={newMessage}

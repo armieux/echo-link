@@ -57,7 +57,13 @@ const Map = () => {
 
     // Initialize map only once
     if (!map.current) {
-      mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
+      const token = import.meta.env.VITE_MAPBOX_TOKEN;
+      if (!token) {
+        console.error('Mapbox token not found in environment variables');
+        return;
+      }
+      
+      mapboxgl.accessToken = token;
       
       map.current = new mapboxgl.Map({
         container: mapContainer.current,

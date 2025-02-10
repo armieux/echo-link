@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -65,16 +64,15 @@ const EmergencyForm = ({ onClose }: EmergencyFormProps) => {
     try {
       const { error } = await supabase
         .from('reports')
-        .insert([
-          {
-            title,
-            description,
-            category,
-            priority,
-            location: `POINT(${location.lng} ${location.lat})`,
-            user_id: user.id
-          }
-        ]);
+        .insert([{
+          title,
+          description,
+          category,
+          priority,
+          latitude: location.lat,
+          longitude: location.lng,
+          user_id: user.id
+        }]);
 
       if (error) throw error;
 

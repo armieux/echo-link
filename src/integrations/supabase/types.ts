@@ -36,6 +36,27 @@ export type Database = {
         }
         Relationships: []
       }
+      config: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          value?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           created_at: string
@@ -1252,6 +1273,12 @@ export type Database = {
           "": string
         }
         Returns: unknown
+      }
+      get_config: {
+        Args: {
+          config_key: string
+        }
+        Returns: string
       }
       get_proj4_from_srid: {
         Args: {
