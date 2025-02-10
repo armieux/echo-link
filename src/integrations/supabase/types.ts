@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      community_chats: {
+        Row: {
+          created_at: string
+          id: string
+          message_text: string
+          region: string | null
+          topic: Database["public"]["Enums"]["chat_topic"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message_text: string
+          region?: string | null
+          topic: Database["public"]["Enums"]["chat_topic"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message_text?: string
+          region?: string | null
+          topic?: Database["public"]["Enums"]["chat_topic"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           created_at: string
@@ -3298,6 +3325,13 @@ export type Database = {
       }
     }
     Enums: {
+      chat_topic:
+        | "premiers_secours"
+        | "pannes_voiture"
+        | "secours_montagne"
+        | "urgences_medicales"
+        | "catastrophes_naturelles"
+        | "autre"
       volunteer_status: "available" | "busy" | "offline"
     }
     CompositeTypes: {

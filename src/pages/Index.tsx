@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import EmergencyButton from "@/components/EmergencyButton";
 import ResourceCard from "@/components/ResourceCard";
 import Map from "@/components/Map";
-import ChatSidebar from "@/components/ChatSidebar";
+import CommunityChat from "@/components/CommunityChat";
 import VolunteerMatching from "@/components/VolunteerMatching";
 import IdentityVerification from "@/components/IdentityVerification";
 import { useState, useEffect } from "react";
@@ -61,32 +61,39 @@ const Index = () => {
             </p>
           </section>
 
-          <section className="mb-16">
-            <Map />
-          </section>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="space-y-8">
+              <section>
+                <Map />
+              </section>
 
-          {latestReportId && (
-            <section className="mb-16">
-              <VolunteerMatching reportId={latestReportId} />
-            </section>
-          )}
+              {latestReportId && (
+                <section>
+                  <VolunteerMatching reportId={latestReportId} />
+                </section>
+              )}
 
-          <section className="mb-16">
-            <IdentityVerification />
-          </section>
+              <section>
+                <IdentityVerification />
+              </section>
 
-          <section className="mb-16">
-            <h2 className="text-2xl font-semibold mb-6">Ressources utiles</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {resources.map((resource) => (
-                <ResourceCard key={resource.title} {...resource} />
-              ))}
+              <section>
+                <h2 className="text-2xl font-semibold mb-6">Ressources utiles</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {resources.map((resource) => (
+                    <ResourceCard key={resource.title} {...resource} />
+                  ))}
+                </div>
+              </section>
             </div>
-          </section>
+
+            <div className="lg:pl-8">
+              <CommunityChat />
+            </div>
+          </div>
         </main>
         <EmergencyButton />
       </div>
-      <ChatSidebar />
     </div>
   );
 };
