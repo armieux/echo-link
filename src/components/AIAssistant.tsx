@@ -14,11 +14,20 @@ const AIAssistant = () => {
   const { messages, isLoading, sendMessage } = useAI();
   const [input, setInput] = useState("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   
-  useEffect(() => {
+  const scrollToBottom = () => {
     if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+      scrollAreaRef.current.scrollTo({
+        top: scrollAreaRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
     }
+  };
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    scrollToBottom();
   }, [messages]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -97,6 +106,8 @@ const AIAssistant = () => {
             <span className="text-sm">L'assistant réfléchit...</span>
           </div>
         )}
+        
+        <div ref={messagesEndRef} />
       </ScrollArea>
 
       <form onSubmit={handleSubmit} className="p-4 border-t">
