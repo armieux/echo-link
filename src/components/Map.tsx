@@ -33,12 +33,21 @@ const Map = () => {
       }
     };
 
+    // Handle escape key
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowForm(false);
+      }
+    };
+
     if (showForm) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscape);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
     };
   }, [showForm]);
 
@@ -182,7 +191,7 @@ const Map = () => {
         <span className="ml-2">Nouveau signalement</span>
       </Button>
 
-      {/* Emergency Form Modal with reduced size */}
+      {/* Emergency Form Modal */}
       {showForm && (
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div ref={modalRef} className="w-full max-w-md max-h-[80vh] bg-white rounded-lg shadow-xl overflow-y-auto">

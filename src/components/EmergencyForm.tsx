@@ -1,11 +1,11 @@
 
-import { useState } from "react";
-import { Send } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import EmergencyPrioritySlider from "./emergency/EmergencyPrioritySlider";
@@ -25,6 +25,20 @@ const EmergencyForm = ({ onClose }: EmergencyFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+
+  // Handle escape key press
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && onClose) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [onClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +107,19 @@ const EmergencyForm = ({ onClose }: EmergencyFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 p-6 bg-white rounded-lg shadow-md">
+    <form onSubmit={handleSubmit} className="relative space-y-6 p-6 bg-white rounded-lg shadow-md">
+      {/* Close button */}
+      {onClose && (
+        <Button
+          type="button"
+          variant="ghost"
+          className="absolute right-2 top-2 p-2 h-auto"
+          onClick={onClose}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      )}
+
       <div className="space-y-2">
         <Label htmlFor="title">Titre de l'urgence</Label>
         <Input
