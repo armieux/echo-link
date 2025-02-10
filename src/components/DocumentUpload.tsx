@@ -3,13 +3,21 @@ import { useCallback, useState } from "react";
 import { UploadIcon, CameraIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { toast } from "@/hooks/use-toast";
+import { Skeleton } from "./ui/skeleton";
 
 interface DocumentUploadProps {
   type: "id" | "selfie";
   onUpload: (file: File) => void;
+  existingFile?: File | null;
+  isLoading?: boolean;
 }
 
-const DocumentUpload = ({ type, onUpload }: DocumentUploadProps) => {
+const DocumentUpload = ({ 
+  type, 
+  onUpload, 
+  existingFile,
+  isLoading = false 
+}: DocumentUploadProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -62,6 +70,30 @@ const DocumentUpload = ({ type, onUpload }: DocumentUploadProps) => {
     reader.readAsDataURL(file);
     onUpload(file);
   };
+
+  // Set preview for existing file
+  useState(() => {
+    if (existingFile) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(existingFile);
+    }
+  });
+
+  if (isLoading) {
+    return (
+      <div className="border-2 border-dashed rounded-lg p-6">
+        <div className="space-y-3">
+          <Skeleton className="h-40 w-full" />
+          <Skeleton className="h-4 w-[200px] mx-auto" />
+          <Skeleton className="h-4 w-[160px] mx-auto" />
+          <Skeleton className="h-9 w-[140px] mx-auto" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

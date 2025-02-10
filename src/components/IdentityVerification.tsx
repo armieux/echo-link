@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import DocumentUpload from "./DocumentUpload";
@@ -7,12 +7,82 @@ import SecuritySettings from "./SecuritySettings";
 import { Button } from "./ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
+interface VerificationDocument {
+  id: string;
+  status: "pending" | "verified" | "rejected";
+  id_document_path: string | null;
+  selfie_path: string | null;
+  submitted_at: string;
+  rejection_reason: string | null;
+}
+
 const IdentityVerification = () => {
   const [idDocument, setIdDocument] = useState<File | null>(null);
   const [selfie, setSelfie] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [verificationStatus, setVerificationStatus] = useState<"pending" | "verified" | "unverified">("unverified");
+  const [isLoading, setIsLoading] = useState(true);
+  const [verificationStatus, setVerificationStatus] = useState<
+    "pending" | "verified" | "rejected" | "unverified"
+  >("unverified");
+  const [verificationDoc, setVerificationDoc] = useState<VerificationDocument | null>(null);
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      fetchVerificationStatus();
+    }
+  }, [user]);
+
+  const fetchVerificationStatus = async () => {
+    try {
+      const { data: verificationData, error } = await supabase
+        .from("verification_documents")
+        .select("*")
+        .eq("user_id", user?.id)
+        .single();
+
+      if (error) throw error;
+
+      if (verificationData) {
+        setVerificationDoc(verificationData);
+        setVerificationStatus(verificationData.status);
+
+        // If documents exist, fetch their URLs
+        if (verificationData.id_document_path) {
+          const { data: idDocUrl } = await supabase.storage
+            .from("identity_verification")
+            .createSignedUrl(verificationData.id_document_path, 3600);
+          
+          if (idDocUrl) {
+            const response = await fetch(idDocUrl.signedUrl);
+            const blob = await response.blob();
+            setIdDocument(new File([blob], "id-document", { type: blob.type }));
+          }
+        }
+
+        if (verificationData.selfie_path) {
+          const { data: selfieUrl } = await supabase.storage
+            .from("identity_verification")
+            .createSignedUrl(verificationData.selfie_path, 3600);
+          
+          if (selfieUrl) {
+            const response = await fetch(selfieUrl.signedUrl);
+            const blob = await response.blob();
+            setSelfie(new File([blob], "selfie", { type: blob.type }));
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching verification status:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de charger le statut de vérification.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const uploadFile = async (file: File, type: "id" | "selfie"): Promise<string> => {
     if (!user) throw new Error("User not authenticated");
@@ -60,14 +130,15 @@ const IdentityVerification = () => {
         uploadFile(selfie, "selfie")
       ]);
 
-      // Create verification request with user_id
+      // Create or update verification request
       const { error: requestError } = await supabase
-        .from('verification_requests')
-        .insert({
+        .from('verification_documents')
+        .upsert({
           user_id: user.id,
           id_document_path: idPath,
           selfie_path: selfiePath,
-          status: 'pending'
+          status: 'pending',
+          submitted_at: new Date().toISOString()
         });
 
       if (requestError) throw requestError;
@@ -77,6 +148,9 @@ const IdentityVerification = () => {
         title: "Documents soumis avec succès",
         description: "Nous examinerons vos documents dans les plus brefs délais.",
       });
+
+      // Refresh verification status
+      await fetchVerificationStatus();
     } catch (error) {
       console.error('Submission error:', error);
       toast({
@@ -98,22 +172,28 @@ const IdentityVerification = () => {
           isVerified={verificationStatus === "verified"}
           verificationStatus={verificationStatus}
           documentSubmissionDate={
-            verificationStatus !== "unverified"
-              ? new Date().toLocaleDateString("fr-FR")
+            verificationDoc?.submitted_at
+              ? new Date(verificationDoc.submitted_at).toLocaleDateString("fr-FR")
               : undefined
           }
+          rejectionReason={verificationDoc?.rejection_reason || undefined}
+          isLoading={isLoading}
         />
 
-        {verificationStatus === "unverified" && (
+        {verificationStatus !== "verified" && (
           <>
             <div className="grid gap-6 md:grid-cols-2">
               <DocumentUpload
                 type="id"
                 onUpload={(file) => setIdDocument(file)}
+                existingFile={idDocument}
+                isLoading={isLoading}
               />
               <DocumentUpload
                 type="selfie"
                 onUpload={(file) => setSelfie(file)}
+                existingFile={selfie}
+                isLoading={isLoading}
               />
             </div>
 
@@ -133,4 +213,3 @@ const IdentityVerification = () => {
 };
 
 export default IdentityVerification;
-

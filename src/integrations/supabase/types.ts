@@ -258,6 +258,45 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_documents: {
+        Row: {
+          created_at: string | null
+          id: string
+          id_document_path: string | null
+          rejection_reason: string | null
+          selfie_path: string | null
+          status: Database["public"]["Enums"]["verification_status"] | null
+          submitted_at: string | null
+          updated_at: string | null
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          id_document_path?: string | null
+          rejection_reason?: string | null
+          selfie_path?: string | null
+          status?: Database["public"]["Enums"]["verification_status"] | null
+          submitted_at?: string | null
+          updated_at?: string | null
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          id_document_path?: string | null
+          rejection_reason?: string | null
+          selfie_path?: string | null
+          status?: Database["public"]["Enums"]["verification_status"] | null
+          submitted_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       verification_requests: {
         Row: {
           created_at: string
@@ -3465,6 +3504,7 @@ export type Database = {
         | "urgences_medicales"
         | "catastrophes_naturelles"
         | "autre"
+      verification_status: "pending" | "verified" | "rejected"
       volunteer_status: "available" | "busy" | "offline"
     }
     CompositeTypes: {

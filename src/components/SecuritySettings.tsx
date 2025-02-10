@@ -1,18 +1,37 @@
 
-import { ShieldCheckIcon, AlertCircleIcon } from "lucide-react";
+import { ShieldCheckIcon, AlertCircleIcon, XCircleIcon } from "lucide-react";
 import VerificationBadge from "./VerificationBadge";
+import { Skeleton } from "./ui/skeleton";
 
 interface SecuritySettingsProps {
   isVerified: boolean;
-  verificationStatus: "pending" | "verified" | "unverified";
+  verificationStatus: "pending" | "verified" | "rejected";
   documentSubmissionDate?: string;
+  rejectionReason?: string;
+  isLoading?: boolean;
 }
 
 const SecuritySettings = ({
   isVerified,
   verificationStatus,
   documentSubmissionDate,
+  rejectionReason,
+  isLoading = false,
 }: SecuritySettingsProps) => {
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-start gap-4 p-4 bg-white rounded-lg shadow-sm">
+          <Skeleton className="w-6 h-6 rounded-full" />
+          <div className="space-y-3 flex-1">
+            <Skeleton className="h-4 w-[200px]" />
+            <Skeleton className="h-4 w-[160px]" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-start gap-4 p-4 bg-white rounded-lg shadow-sm">
@@ -27,10 +46,21 @@ const SecuritySettings = ({
                 En attente de validation
               </span>
             )}
+            {verificationStatus === "rejected" && (
+              <span className="text-red-600 text-sm flex items-center gap-1">
+                <XCircleIcon className="w-4 h-4" />
+                Rejeté
+              </span>
+            )}
           </div>
           {documentSubmissionDate && (
             <p className="text-sm text-gray-500">
               Documents soumis le {documentSubmissionDate}
+            </p>
+          )}
+          {rejectionReason && (
+            <p className="mt-2 text-sm text-red-600 bg-red-50 p-3 rounded-md">
+              Raison du rejet : {rejectionReason}
             </p>
           )}
         </div>
