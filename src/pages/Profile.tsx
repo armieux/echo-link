@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { UserReviews } from "@/components/UserReviews";
-import { User, Mail, MapPin, Trash2, Save, Plus, X } from "lucide-react";
+import { User, Mail, MapPin, Trash2, Save, Plus, X, ChartBar, Star, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   Select,
@@ -36,6 +35,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@/components/ui/tabs";
 
 const SKILLS = [
   { value: 'premiers_secours', label: 'Premiers Secours' },
