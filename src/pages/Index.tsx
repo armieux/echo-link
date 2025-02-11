@@ -11,6 +11,9 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useScrollPosition } from "@/hooks/useScrollPosition";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
 
 const resources = [
   {
@@ -36,6 +39,8 @@ const resources = [
 const Index = () => {
   const [latestReportId, setLatestReportId] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
   useScrollPosition();
 
   useEffect(() => {
@@ -55,6 +60,64 @@ const Index = () => {
     fetchLatestReport();
   }, []);
 
+  const handleVolunteerClick = async () => {
+    if (!user) {
+      toast({
+        title: "Connexion requise",
+        description: "Vous devez être connecté pour proposer votre aide",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // First check if volunteer entry exists
+      const { data: existingVolunteer } = await supabase
+        .from('volunteers')
+        .select('id, availability')
+        .eq('user_id', user.id)
+        .single();
+
+      if (existingVolunteer) {
+        // Update availability to available
+        const { error: updateError } = await supabase
+          .from('volunteers')
+          .update({ availability: 'available' })
+          .eq('id', existingVolunteer.id);
+
+        if (updateError) throw updateError;
+
+        toast({
+          description: "Vous êtes maintenant disponible pour aider",
+        });
+      } else {
+        // Create new volunteer entry with default location
+        const { error: createError } = await supabase
+          .from('volunteers')
+          .insert({
+            user_id: user.id,
+            availability: 'available',
+            skills: [],
+            location: 'POINT(2.3488 48.8534)' // Default to Paris coordinates
+          });
+
+        if (createError) throw createError;
+
+        toast({
+          description: "Votre profil volontaire a été créé. Veuillez configurer vos compétences dans votre profil.",
+        });
+        navigate("/profile"); // Redirect to profile to set up skills
+      }
+    } catch (error) {
+      console.error('Error managing volunteer status:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen flex">
       <div className="flex-1 overflow-y-auto">
@@ -64,9 +127,19 @@ const Index = () => {
             <h1 className="text-4xl font-bold text-center mb-2">
               Assistance d'urgence immédiate
             </h1>
-            <p className="text-gray-600 text-center max-w-2xl mx-auto">
+            <p className="text-gray-600 text-center max-w-2xl mx-auto mb-6">
               EchoLink vous connecte instantanément aux secours et à la communauté en cas d'urgence
             </p>
+            {user && (
+              <div className="flex justify-center">
+                <Button 
+                  onClick={handleVolunteerClick}
+                  className="bg-emergency hover:bg-emergency/90"
+                >
+                  Proposer mon aide
+                </Button>
+              </div>
+            )}
           </section>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
