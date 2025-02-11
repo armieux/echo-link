@@ -876,9 +876,7 @@ export type Database = {
         Returns: {
           volunteer_id: string
           distance_meters: number
-          matching_skills: string[]
           skill_match_percentage: number
-          rating: number
         }[]
       }
       geography:
