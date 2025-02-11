@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface MessageListProps {
   messages: CommunityMessage[];
-  shoulScroll: boolean;
+  shoulScroll: boolean; // Keep the typo for compatibility
 }
 
 export default function MessageList({ messages, shoulScroll = false }: MessageListProps) {

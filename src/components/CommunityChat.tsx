@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,9 +24,9 @@ export default function CommunityChat() {
 
   useEffect(() => {
     if (activeTab === 'community') {
-      loadMessages();
+      loadCommunityMessages();
     } else {
-      loadReports();
+      loadReportMessages();
     }
 
     const channel = supabase
@@ -60,7 +59,7 @@ export default function CommunityChat() {
     };
   }, [activeTab, selectedTopic, selectedRegion, selectedReport]);
 
-  const loadMessages = async () => {
+  const loadCommunityMessages = async () => {
     try {
       let query = supabase
         .from('community_chats')
@@ -77,7 +76,15 @@ export default function CommunityChat() {
       const { data, error } = await query;
 
       if (error) throw error;
-      setMessages(data || []);
+      
+      // Add topic and region to match CommunityMessage type
+      const messagesWithDefaults = (data || []).map(msg => ({
+        ...msg,
+        topic: msg.topic || selectedTopic,
+        region: msg.region || selectedRegion
+      })) as CommunityMessage[];
+      
+      setMessages(messagesWithDefaults);
     } catch (error) {
       toast({
         variant: "destructive",
@@ -87,25 +94,35 @@ export default function CommunityChat() {
     }
   };
 
-  const loadReports = async () => {
+  const loadReportMessages = async () => {
     try {
-      const { data, error } = await supabase
+      // First load reports
+      const { data: reportsData, error: reportsError } = await supabase
         .from('reports')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setReports(data || []);
+      if (reportsError) throw reportsError;
+      setReports(reportsData || []);
 
+      // Then load messages if a report is selected
       if (selectedReport) {
-        const { data: messages, error: msgError } = await supabase
+        const { data: messagesData, error: messagesError } = await supabase
           .from('report_messages')
           .select('*')
           .eq('report_id', selectedReport)
           .order('created_at', { ascending: true });
 
-        if (msgError) throw msgError;
-        setMessages(messages || []);
+        if (messagesError) throw messagesError;
+
+        // Convert to CommunityMessage type
+        const messagesWithDefaults = (messagesData || []).map(msg => ({
+          ...msg,
+          topic: undefined,
+          region: undefined
+        })) as CommunityMessage[];
+
+        setMessages(messagesWithDefaults);
       }
     } catch (error) {
       toast({
@@ -212,7 +229,7 @@ export default function CommunityChat() {
 
       <MessageList 
         messages={messages}
-        shouldScroll={true}
+        shoulScroll={true}
       />
 
       <MessageInput
