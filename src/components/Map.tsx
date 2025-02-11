@@ -190,11 +190,11 @@ const Map = () => {
       
       {/* Floating Action Button to show/hide form */}
       <Button
-        className="absolute top-4 right-4 rounded-full shadow-lg"
+        className="absolute top-4 right-16 rounded-full shadow-lg"
         onClick={() => setShowForm(!showForm)}
       >
         <Plus className="h-4 w-4" />
-        <span className="ml-2">Nouveau signalement</span>
+        <span className="ml-5">Nouveau signalement</span>
       </Button>
 
       {/* Emergency Form Modal */}
