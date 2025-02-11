@@ -1,10 +1,7 @@
-
 import { useState, useEffect, useRef } from "react";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import EmergencyForm from "./EmergencyForm";
-import { Button } from "./ui/button";
-import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Report {
@@ -95,7 +92,6 @@ const Map = () => {
       map.current?.remove();
     };
   }, []);
-
 
   // Fetch initial reports
   useEffect(() => {
@@ -203,15 +199,6 @@ const Map = () => {
     <div className="relative w-full h-[600px] bg-gray-100 rounded-lg overflow-hidden">
       <div ref={mapContainer} className="absolute inset-0" />
       
-      {/* Floating Action Button to show/hide form */}
-      <Button
-        className="absolute top-4 right-16 rounded-full shadow-lg"
-        onClick={() => setShowForm(!showForm)}
-      >
-        <Plus className="h-4 w-4" />
-        <span className="ml-5">Nouveau signalement</span>
-      </Button>
-
       {/* Emergency Form Modal */}
       {showForm && (
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">

@@ -3,6 +3,7 @@ import { useRef, useEffect, useState } from 'react';
 import type { CommunityMessage } from '@/types/community-chat';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { Loader2 } from 'lucide-react';
 
 interface MessageListProps {
   messages: CommunityMessage[];
@@ -17,6 +18,7 @@ export default function MessageList({ messages, shoulScroll = false }: MessageLi
   const { user } = useAuth();
   const messageEndRef = useRef<HTMLDivElement>(null);
   const [usernames, setUsernames] = useState<UserInfo>({});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (shoulScroll) {
@@ -26,31 +28,48 @@ export default function MessageList({ messages, shoulScroll = false }: MessageLi
 
   useEffect(() => {
     const fetchUsernames = async () => {
+      setIsLoading(true);
       const uniqueUserIds = [...new Set(messages.map(msg => msg.user_id))];
       const userInfoMap: UserInfo = {};
 
-      // Fetch usernames for all unique user IDs
-      const { data, error } = await supabase
-          .from('profiles')
-          .select('id, username')
-          .in('id', uniqueUserIds);
+      try {
+        // Fetch usernames for all unique user IDs
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('id, username')
+            .in('id', uniqueUserIds);
 
-      if (error) {
-        console.error('Error fetching usernames:', error);
-        return;
+        if (error) {
+          console.error('Error fetching usernames:', error);
+          return;
+        }
+
+        data.forEach(profile => {
+          userInfoMap[profile.id] = profile.username || `Utilisateur ${profile.id.slice(0, 8)}`;
+        });
+
+        setUsernames(userInfoMap);
+      } catch (error) {
+        console.error('Error in fetchUsernames:', error);
+      } finally {
+        setIsLoading(false);
       }
-
-      data.forEach(profile => {
-        userInfoMap[profile.id] = profile.username || `Utilisateur ${profile.id.slice(0, 8)}`;
-      });
-
-      setUsernames(userInfoMap);
     };
 
     if (messages.length > 0) {
       fetchUsernames();
+    } else {
+      setIsLoading(false);
     }
   }, [messages]);
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center p-4">
+        <Loader2 className="h-8 w-8 animate-spin text-emergency" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
