@@ -32,7 +32,7 @@ export default function MessageList({ messages, shoulScroll = false }: MessageLi
       // Fetch usernames for all unique user IDs
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, username, full_name')
+        .select('id, username')
         .in('id', uniqueUserIds);
 
       if (error) {
@@ -41,7 +41,7 @@ export default function MessageList({ messages, shoulScroll = false }: MessageLi
       }
 
       data.forEach(profile => {
-        userInfoMap[profile.id] = profile.username || profile.full_name || `Utilisateur ${profile.id.slice(0, 8)}`;
+        userInfoMap[profile.id] = profile.username || `Utilisateur ${profile.id.slice(0, 8)}`;
       });
 
       setUsernames(userInfoMap);
