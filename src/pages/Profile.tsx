@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { UserReviews } from "@/components/UserReviews";
-import { User, Mail, MapPin, Trash2, Save, Plus, X, ChartBar, Star, AlertTriangle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { User, Mail, MapPin, Trash2, Save, Plus, X, ChartBar, Star, AlertTriangle, LogOut } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Select,
   SelectContent,
@@ -41,6 +41,13 @@ import {
   TabsTrigger,
   TabsContent,
 } from "@/components/ui/tabs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const SKILLS = [
   { value: 'premiers_secours', label: 'Premiers Secours' },
@@ -177,7 +184,6 @@ export default function Profile() {
   };
 
   const deleteAccount = async () => {
-    // First delete related data
     if (!user) return;
     
     const { error: deleteDataError } = await supabase
@@ -293,199 +299,257 @@ export default function Profile() {
     });
   };
 
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate("/auth");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
+  const getInitials = (email: string) => {
+    return email
+      .split("@")[0]
+      .split(/[-._]/)
+      .map((part) => part.charAt(0).toUpperCase())
+      .join("")
+      .slice(0, 2);
+  };
+
   if (!user) return null;
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <h1 className="text-2xl font-bold mb-8">Mon Profil</h1>
+    <div className="min-h-screen">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Link 
+              to="/" 
+              className="text-emergency font-bold text-2xl hover:opacity-80 transition-opacity"
+            >
+              EchoLink
+            </Link>
+          </div>
+          <div className="flex items-center gap-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="relative h-10 w-10 rounded-full"
+                >
+                  <Avatar className="h-10 w-10">
+                    <AvatarFallback>
+                      {getInitials(user.email || "")}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Se déconnecter</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      </header>
 
-      <div className="grid gap-8 md:grid-cols-[1fr_2fr]">
-        <div className="space-y-6">
-          <Card className="p-6">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
-                {profile?.avatar_url ? (
-                  <img
-                    src={profile.avatar_url}
-                    alt="Profile"
-                    className="w-full h-full rounded-full object-cover"
-                  />
+      <div className="container mx-auto py-8 px-4 pt-24">
+        <h1 className="text-2xl font-bold mb-8">Mon Profil</h1>
+
+        <div className="grid gap-8 md:grid-cols-[1fr_2fr]">
+          <div className="space-y-6">
+            <Card className="p-6">
+              <div className="flex flex-col items-center space-y-4">
+                <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
+                  {profile?.avatar_url ? (
+                    <img
+                      src={profile.avatar_url}
+                      alt="Profile"
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-12 h-12 text-gray-400" />
+                  )}
+                </div>
+
+                {isEditing ? (
+                  <div className="w-full space-y-4">
+                    <Input
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="Nom d'utilisateur"
+                    />
+                    <div className="flex gap-2">
+                      <Button onClick={updateProfile}>Sauvegarder</Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsEditing(false)}
+                      >
+                        Annuler
+                      </Button>
+                    </div>
+                  </div>
                 ) : (
-                  <User className="w-12 h-12 text-gray-400" />
+                  <>
+                    <div className="text-center">
+                      <h2 className="text-xl font-semibold">
+                        {profile?.username || "Sans nom"}
+                      </h2>
+                      <p className="text-gray-500 flex items-center justify-center gap-2">
+                        <Mail className="w-4 h-4" />
+                        {user.email}
+                      </p>
+                    </div>
+                    <Button onClick={() => setIsEditing(true)}>
+                      Modifier le profil
+                    </Button>
+                  </>
                 )}
               </div>
+            </Card>
 
-              {isEditing ? (
-                <div className="w-full space-y-4">
-                  <Input
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Nom d'utilisateur"
-                  />
-                  <div className="flex gap-2">
-                    <Button onClick={updateProfile}>Sauvegarder</Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsEditing(false)}
-                    >
-                      Annuler
-                    </Button>
-                  </div>
+            <Card className="p-6">
+              <h3 className="font-semibold mb-4">Compétences</h3>
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <Select value={selectedSkill} onValueChange={setSelectedSkill}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choisir une compétence" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SKILLS.map(skill => (
+                        <SelectItem key={skill.value} value={skill.value}>
+                          {skill.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button onClick={addSkill} disabled={!selectedSkill}>
+                    <Plus className="w-4 h-4" />
+                  </Button>
                 </div>
-              ) : (
-                <>
-                  <div className="text-center">
-                    <h2 className="text-xl font-semibold">
-                      {profile?.username || "Sans nom"}
-                    </h2>
-                    <p className="text-gray-500 flex items-center justify-center gap-2">
-                      <Mail className="w-4 h-4" />
-                      {user.email}
-                    </p>
-                  </div>
-                  <Button onClick={() => setIsEditing(true)}>
-                    Modifier le profil
-                  </Button>
-                </>
-              )}
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="font-semibold mb-4">Compétences</h3>
-            <div className="space-y-4">
-              <div className="flex gap-2">
-                <Select value={selectedSkill} onValueChange={setSelectedSkill}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choisir une compétence" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {SKILLS.map(skill => (
-                      <SelectItem key={skill.value} value={skill.value}>
-                        {skill.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Button onClick={addSkill} disabled={!selectedSkill}>
-                  <Plus className="w-4 h-4" />
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {volunteer?.skills.map(skill => {
-                  const skillLabel = SKILLS.find(s => s.value === skill)?.label || skill;
-                  return (
-                    <div
-                      key={skill}
-                      className="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-2"
-                    >
-                      <span>{skillLabel}</span>
-                      <button
-                        onClick={() => removeSkill(skill)}
-                        className="text-gray-500 hover:text-red-500"
+                <div className="flex flex-wrap gap-2">
+                  {volunteer?.skills.map(skill => {
+                    const skillLabel = SKILLS.find(s => s.value === skill)?.label || skill;
+                    return (
+                      <div
+                        key={skill}
+                        className="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-2"
                       >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  );
-                })}
+                        <span>{skillLabel}</span>
+                        <button
+                          onClick={() => removeSkill(skill)}
+                          className="text-gray-500 hover:text-red-500"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          </Card>
+            </Card>
 
-          <Card className="p-6">
-            <h3 className="font-semibold mb-4">Paramètres du compte</h3>
-            <div className="space-y-4">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="w-full">
-                    Changer d'email
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Changer d'email</DialogTitle>
-                    <DialogDescription>
-                      Entrez votre nouvelle adresse email. Un email de confirmation vous sera envoyé.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <Input
-                    type="email"
-                    placeholder="Nouvel email"
-                    value={newEmail}
-                    onChange={(e) => setNewEmail(e.target.value)}
-                  />
-                  <DialogFooter>
-                    <Button onClick={updateEmail}>Confirmer</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+            <Card className="p-6">
+              <h3 className="font-semibold mb-4">Paramètres du compte</h3>
+              <div className="space-y-4">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full">
+                      Changer d'email
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Changer d'email</DialogTitle>
+                      <DialogDescription>
+                        Entrez votre nouvelle adresse email. Un email de confirmation vous sera envoyé.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <Input
+                      type="email"
+                      placeholder="Nouvel email"
+                      value={newEmail}
+                      onChange={(e) => setNewEmail(e.target.value)}
+                    />
+                    <DialogFooter>
+                      <Button onClick={updateEmail}>Confirmer</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
 
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="w-full">
-                    Changer de mot de passe
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Changer de mot de passe</DialogTitle>
-                    <DialogDescription>
-                      Entrez votre nouveau mot de passe.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <Input
-                    type="password"
-                    placeholder="Nouveau mot de passe"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                  />
-                  <DialogFooter>
-                    <Button onClick={updatePassword}>Confirmer</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full">
+                      Changer de mot de passe
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Changer de mot de passe</DialogTitle>
+                      <DialogDescription>
+                        Entrez votre nouveau mot de passe.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <Input
+                      type="password"
+                      placeholder="Nouveau mot de passe"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                    />
+                    <DialogFooter>
+                      <Button onClick={updatePassword}>Confirmer</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
 
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive" className="w-full">
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Supprimer le compte
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Cette action est irréversible. Toutes vos données seront supprimées définitivement.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Annuler</AlertDialogCancel>
-                    <AlertDialogAction onClick={deleteAccount} className="bg-red-500 hover:bg-red-600">
-                      Supprimer
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="font-semibold mb-4">Statistiques</h3>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span>Note moyenne</span>
-                <span className="font-semibold">
-                  {profile?.rating?.toFixed(1) || "N/A"}
-                </span>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" className="w-full">
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Supprimer le compte
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Cette action est irréversible. Toutes vos données seront supprimées définitivement.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                      <AlertDialogAction onClick={deleteAccount} className="bg-red-500 hover:bg-red-600">
+                        Supprimer
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
-            </div>
-          </Card>
-        </div>
+            </Card>
 
-        <div className="space-y-6">
-          <UserReviews />
+            <Card className="p-6">
+              <h3 className="font-semibold mb-4">Statistiques</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span>Note moyenne</span>
+                  <span className="font-semibold">
+                    {profile?.rating?.toFixed(1) || "N/A"}
+                  </span>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          <div className="space-y-6">
+            <UserReviews />
+          </div>
         </div>
       </div>
     </div>
