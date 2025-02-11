@@ -17,6 +17,7 @@ import EmergencyResources from "./pages/resources/EmergencyResources";
 import RecoveryPosition from "./pages/resources/first-aid/RecoveryPosition";
 import CPR from "./pages/resources/first-aid/CPR";
 import BleedingControl from "./pages/resources/first-aid/BleedingControl";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,14 @@ const App = () => (
                     element={
                       <ProtectedRoute>
                         <Index />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute>
+                        <Profile />
                       </ProtectedRoute>
                     }
                   />

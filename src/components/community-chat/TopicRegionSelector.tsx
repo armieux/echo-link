@@ -52,7 +52,6 @@ export default function TopicRegionSelector({
         value={selectedTopic}
         onValueChange={(value: ChatTopic) => {
           setSelectedTopic(value);
-          setSelectedRegion('');
         }}
       >
         <SelectTrigger className="w-[200px]">
@@ -71,7 +70,6 @@ export default function TopicRegionSelector({
         value={selectedRegion}
         onValueChange={(value: string) => {
           setSelectedRegion(value);
-          setSelectedTopic('autre');
         }}
       >
         <SelectTrigger className="w-[200px]">

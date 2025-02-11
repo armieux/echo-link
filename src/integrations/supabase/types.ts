@@ -85,15 +85,7 @@ export type Database = {
           report_id?: string | null
           sender_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "messages_report_id_fkey"
-            columns: ["report_id"]
-            isOneToOne: false
-            referencedRelation: "reports"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       notifications: {
         Row: {
@@ -123,15 +115,7 @@ export type Database = {
           report_id?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "notifications_report_id_fkey"
-            columns: ["report_id"]
-            isOneToOne: false
-            referencedRelation: "reports"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -174,43 +158,43 @@ export type Database = {
       }
       reports: {
         Row: {
-          category: string
+          category: string | null
           created_at: string
-          description: string
+          description: string | null
           id: string
-          latitude: number
-          longitude: number
-          priority: number
-          required_skills: string[] | null
+          latitude: number | null
+          longitude: number | null
+          priority: number | null
+          required_skills: string | null
           status: string | null
-          title: string
-          user_id: string
+          title: string | null
+          user_id: string | null
         }
         Insert: {
-          category: string
+          category?: string | null
           created_at?: string
-          description: string
+          description?: string | null
           id?: string
-          latitude: number
-          longitude: number
-          priority: number
-          required_skills?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
+          priority?: number | null
+          required_skills?: string | null
           status?: string | null
-          title: string
-          user_id: string
+          title?: string | null
+          user_id?: string | null
         }
         Update: {
-          category?: string
+          category?: string | null
           created_at?: string
-          description?: string
+          description?: string | null
           id?: string
-          latitude?: number
-          longitude?: number
-          priority?: number
-          required_skills?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
+          priority?: number | null
+          required_skills?: string | null
           status?: string | null
-          title?: string
-          user_id?: string
+          title?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -374,13 +358,6 @@ export type Database = {
           volunteer_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "volunteer_requests_report_id_fkey"
-            columns: ["report_id"]
-            isOneToOne: false
-            referencedRelation: "reports"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "volunteer_requests_volunteer_id_fkey"
             columns: ["volunteer_id"]
