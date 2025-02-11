@@ -1,5 +1,5 @@
 
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "./NotificationBell";
 import { useNavigate, Link } from "react-router-dom";
@@ -64,6 +64,13 @@ const Header = () => {
               <DropdownMenuContent align="end">
                 <DropdownMenuItem
                   className="cursor-pointer"
+                  onClick={() => navigate("/profile")}
+                >
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Mon Profil</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
                   onClick={handleSignOut}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
@@ -87,4 +94,3 @@ const Header = () => {
 };
 
 export default Header;
-

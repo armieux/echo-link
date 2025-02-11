@@ -31,7 +31,7 @@ export default function CommunityChat() {
           schema: 'public',
           table: 'community_chats',
           filter: selectedRegion 
-            ? `region=eq.${selectedRegion}` 
+            ? `region=eq.${selectedRegion} and topic=eq.${selectedTopic}`
             : `topic=eq.${selectedTopic}`
         },
         (payload) => {
@@ -57,9 +57,8 @@ export default function CommunityChat() {
 
       if (selectedRegion) {
         query = query.eq('region', selectedRegion);
-      } else {
-        query = query.eq('topic', selectedTopic);
       }
+      query = query.eq('topic', selectedTopic);
 
       const { data, error } = await query;
 
@@ -75,7 +74,16 @@ export default function CommunityChat() {
   };
 
   const sendMessage = async () => {
-    if (!newMessage.trim() || !user) return;
+    if (!newMessage.trim() || !user || !selectedRegion) {
+      if (!selectedRegion) {
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Veuillez sélectionner une région",
+        });
+      }
+      return;
+    }
 
     try {
       const { error } = await supabase
@@ -83,7 +91,7 @@ export default function CommunityChat() {
         .insert({
           message_text: newMessage.trim(),
           topic: selectedTopic,
-          region: selectedRegion || null,
+          region: selectedRegion,
           user_id: user.id
         });
 
