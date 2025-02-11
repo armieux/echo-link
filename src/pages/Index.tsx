@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 
+type VolunteerStatus = 'available' | 'offline';
+
 const resources = [
   {
     title: "Guide des premiers secours",
@@ -38,6 +40,7 @@ const resources = [
 
 const Index = () => {
   const [latestReportId, setLatestReportId] = useState<string | null>(null);
+  const [volunteerStatus, setVolunteerStatus] = useState<VolunteerStatus | null>(null);
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -60,6 +63,29 @@ const Index = () => {
     fetchLatestReport();
   }, []);
 
+  useEffect(() => {
+    if (user) {
+      fetchVolunteerStatus();
+    }
+  }, [user]);
+
+  const fetchVolunteerStatus = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('volunteers')
+      .select('availability')
+      .eq('user_id', user.id)
+      .single();
+
+    if (!error && data) {
+      const status = data.availability === 'available' ? 'available' : 'offline';
+      setVolunteerStatus(status);
+    } else {
+      setVolunteerStatus(null);
+    }
+  };
+
   const handleVolunteerClick = async () => {
     if (!user) {
       toast({
@@ -79,16 +105,21 @@ const Index = () => {
         .single();
 
       if (existingVolunteer) {
-        // Update availability to available
+        // Toggle availability
+        const newAvailability: VolunteerStatus = existingVolunteer.availability === 'available' ? 'offline' : 'available';
+        
         const { error: updateError } = await supabase
           .from('volunteers')
-          .update({ availability: 'available' })
+          .update({ availability: newAvailability })
           .eq('id', existingVolunteer.id);
 
         if (updateError) throw updateError;
 
+        setVolunteerStatus(newAvailability);
         toast({
-          description: "Vous êtes maintenant disponible pour aider",
+          description: newAvailability === 'available' 
+            ? "Vous êtes maintenant disponible pour aider"
+            : "Vous n'êtes plus disponible pour aider",
         });
       } else {
         // Create new volunteer entry with default location
@@ -103,6 +134,7 @@ const Index = () => {
 
         if (createError) throw createError;
 
+        setVolunteerStatus('available');
         toast({
           description: "Votre profil volontaire a été créé. Veuillez configurer vos compétences dans votre profil.",
         });
@@ -134,9 +166,13 @@ const Index = () => {
               <div className="flex justify-center">
                 <Button 
                   onClick={handleVolunteerClick}
-                  className="bg-emergency hover:bg-emergency/90"
+                  className={volunteerStatus === 'available' 
+                    ? "bg-gray-500 hover:bg-gray-600" 
+                    : "bg-emergency hover:bg-emergency/90"}
                 >
-                  Proposer mon aide
+                  {volunteerStatus === 'available' 
+                    ? "Ne plus proposer mon aide"
+                    : "Proposer mon aide"}
                 </Button>
               </div>
             )}
