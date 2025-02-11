@@ -36,11 +36,17 @@ async function fetchNearbyVolunteers(reportId: string) {
     throw new Error("Report not found");
   }
 
+  // Ensure required_skills is always an array
+  const requiredSkills = report.required_skills || [];
+  if (!Array.isArray(requiredSkills)) {
+    throw new Error("Required skills must be an array");
+  }
+
   const { data, error } = await supabase
     .rpc('find_nearby_volunteers', {
       report_latitude: report.latitude,
       report_longitude: report.longitude,
-      required_skills: report.required_skills || [],
+      required_skills: requiredSkills,
       max_distance_km: 10
     });
 

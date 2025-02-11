@@ -63,7 +63,8 @@ const EmergencyForm = ({ onClose }: EmergencyFormProps) => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase
+      // Create the report
+      const { data: report, error: reportError } = await supabase
         .from('reports')
         .insert([{
           title,
@@ -73,9 +74,24 @@ const EmergencyForm = ({ onClose }: EmergencyFormProps) => {
           latitude: location.lat,
           longitude: location.lng,
           user_id: user.id
-        }]);
+        }])
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (reportError) throw reportError;
+
+      // Create notification for nearby volunteers
+      const { error: notificationError } = await supabase
+        .from('notifications')
+        .insert({
+          user_id: user.id,
+          message: `Nouveau signalement: ${title}`,
+          type: 'report_created',
+          report_id: report.id,
+          distance_meters: 0 // This will be calculated by the backend
+        });
+
+      if (notificationError) throw notificationError;
 
       toast({
         title: "Signalement envoyé",

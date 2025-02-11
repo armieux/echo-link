@@ -177,9 +177,29 @@ export default function Profile() {
   };
 
   const deleteAccount = async () => {
-    const { error } = await supabase.rpc('delete_user');
+    // First delete related data
+    if (!user) return;
     
-    if (error) {
+    const { error: deleteDataError } = await supabase
+      .from('profiles')
+      .delete()
+      .eq('id', user.id);
+    
+    if (deleteDataError) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de supprimer les données du compte",
+      });
+      return;
+    }
+
+    // Then delete auth user
+    const { error: deleteAuthError } = await supabase.auth.admin.deleteUser(
+      user.id
+    );
+    
+    if (deleteAuthError) {
       toast({
         variant: "destructive",
         title: "Erreur",
