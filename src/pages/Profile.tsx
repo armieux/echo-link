@@ -482,7 +482,7 @@ export default function Profile() {
                     <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
                     <AlertDialogDescription>
                       Cette action est irréversible. Toutes vos données seront supprimées définitivement.
-                    </DialogDialogDescription>
+                    </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Annuler</AlertDialogCancel>
