@@ -121,13 +121,16 @@ const EmergencyForm = ({ onClose }: EmergencyFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="relative space-y-6 p-6 bg-white rounded-lg shadow-md">
+    <form onSubmit={handleSubmit} className="relative space-y-6 p-6 bg-white rounded-lg shadow-md" onClick={(e) => e.stopPropagation()}>
       {onClose && (
         <Button
           type="button"
           variant="ghost"
           className="absolute right-2 top-2 p-2 h-auto"
-          onClick={onClose}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
         >
           <X className="h-4 w-4" />
         </Button>

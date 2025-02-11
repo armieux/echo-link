@@ -187,7 +187,7 @@ export default function CommunityChat() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] bg-white shadow-lg rounded-lg">
+    <div className="h-[600px] bg-white shadow-lg rounded-lg flex flex-col">
       <Tabs defaultValue="community" className="w-full" onValueChange={setActiveTab}>
         <div className="p-4 border-b border-gray-200">
           <TabsList className="w-full">
@@ -227,10 +227,12 @@ export default function CommunityChat() {
         </div>
       </Tabs>
 
-      <MessageList 
-        messages={messages}
-        shoulScroll={true}
-      />
+      <div className="flex-1 overflow-hidden">
+        <MessageList 
+          messages={messages}
+          shoulScroll={true}
+        />
+      </div>
 
       <MessageInput
         newMessage={newMessage}

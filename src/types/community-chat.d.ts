@@ -13,7 +13,7 @@ export interface CommunityMessage {
 
 export interface MessageListProps {
   messages: CommunityMessage[];
-  shoulScroll?: boolean; // Keep the typo since it's used in the component
+  shoulScroll?: boolean;
 }
 
 export interface MessageInputProps {
