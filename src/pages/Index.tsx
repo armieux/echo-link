@@ -101,10 +101,10 @@ const Index = () => {
 
             <div className="lg:pl-8 space-y-8">
               <section>
-                <AIAssistant />
+                <CommunityChat />
               </section>
               <section>
-                <CommunityChat />
+                <AIAssistant />
               </section>
             </div>
           </div>

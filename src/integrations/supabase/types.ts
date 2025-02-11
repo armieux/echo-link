@@ -95,6 +95,7 @@ export type Database = {
           is_read: boolean
           message: string
           report_id: string
+          type: Database["public"]["Enums"]["notification_type"] | null
           user_id: string
         }
         Insert: {
@@ -104,6 +105,7 @@ export type Database = {
           is_read?: boolean
           message: string
           report_id: string
+          type?: Database["public"]["Enums"]["notification_type"] | null
           user_id: string
         }
         Update: {
@@ -113,6 +115,7 @@ export type Database = {
           is_read?: boolean
           message?: string
           report_id?: string
+          type?: Database["public"]["Enums"]["notification_type"] | null
           user_id?: string
         }
         Relationships: []
@@ -155,6 +158,38 @@ export type Database = {
           verification_status?: string | null
         }
         Relationships: []
+      }
+      report_messages: {
+        Row: {
+          created_at: string | null
+          id: string
+          message_text: string
+          report_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message_text: string
+          report_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message_text?: string
+          report_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_messages_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reports: {
         Row: {
@@ -3505,6 +3540,10 @@ export type Database = {
         | "urgences_medicales"
         | "catastrophes_naturelles"
         | "autre"
+      notification_type:
+        | "report_created"
+        | "message_received"
+        | "review_received"
       verification_status: "pending" | "verified" | "rejected"
       volunteer_status: "available" | "busy" | "offline"
     }
