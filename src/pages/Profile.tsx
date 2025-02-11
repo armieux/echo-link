@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -299,8 +300,15 @@ export default function Profile() {
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-2xl font-bold mb-8">Mon Profil</h1>
 
-      <div className="grid gap-8 md:grid-cols-[1fr_2fr]">
-        <div className="space-y-6">
+      <Tabs defaultValue="profile" className="w-full">
+        <TabsList className="mb-8">
+          <TabsTrigger value="profile">Profil</TabsTrigger>
+          <TabsTrigger value="skills">Compétences</TabsTrigger>
+          <TabsTrigger value="settings">Paramètres</TabsTrigger>
+          <TabsTrigger value="reviews">Avis</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="profile">
           <Card className="p-6">
             <div className="flex flex-col items-center space-y-4">
               <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
@@ -351,6 +359,20 @@ export default function Profile() {
             </div>
           </Card>
 
+          <Card className="p-6 mt-6">
+            <h3 className="font-semibold mb-4">Statistiques</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span>Note moyenne</span>
+                <span className="font-semibold">
+                  {profile?.rating?.toFixed(1) || "N/A"}
+                </span>
+              </div>
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="skills">
           <Card className="p-6">
             <h3 className="font-semibold mb-4">Compétences</h3>
             <div className="space-y-4">
@@ -392,7 +414,9 @@ export default function Profile() {
               </div>
             </div>
           </Card>
+        </TabsContent>
 
+        <TabsContent value="settings">
           <Card className="p-6">
             <h3 className="font-semibold mb-4">Paramètres du compte</h3>
             <div className="space-y-4">
@@ -458,7 +482,7 @@ export default function Profile() {
                     <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
                     <AlertDialogDescription>
                       Cette action est irréversible. Toutes vos données seront supprimées définitivement.
-                    </AlertDialogDescription>
+                    </DialogDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Annuler</AlertDialogCancel>
@@ -470,24 +494,14 @@ export default function Profile() {
               </AlertDialog>
             </div>
           </Card>
+        </TabsContent>
 
-          <Card className="p-6">
-            <h3 className="font-semibold mb-4">Statistiques</h3>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span>Note moyenne</span>
-                <span className="font-semibold">
-                  {profile?.rating?.toFixed(1) || "N/A"}
-                </span>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        <div className="space-y-6">
-          <UserReviews />
-        </div>
-      </div>
+        <TabsContent value="reviews">
+          <div className="space-y-6">
+            <UserReviews />
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
