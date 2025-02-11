@@ -55,32 +55,47 @@ const Map = () => {
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    // Initialize map only once
+    // Créez la carte une seule fois
     if (!map.current) {
       const token = import.meta.env.VITE_MAPBOX_TOKEN;
       if (!token) {
         console.error('Mapbox token not found in environment variables');
         return;
       }
-      
+
       mapboxgl.accessToken = token;
-      
+
+      // Initialisation de la carte
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/streets-v12',
-        center: [2.3522, 48.8566], // Paris coordinates
+        center: [2.3522, 48.8566], // coordonnées par défaut (Paris)
         zoom: 11
       });
 
-      // Add navigation controls
+      // Ajout de contrôles de navigation
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+      // Récupération de la géolocalisation de l'utilisateur
+      navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            // Mise à jour du centre de la carte (longitude d'abord, latitude ensuite)
+            map.current?.setCenter([longitude, latitude]);
+          },
+          (error) => {
+            console.error('Erreur de géolocalisation:', error);
+            // Vous pouvez laisser la carte centrée sur Paris ou gérer un fallback
+          }
+      );
     }
 
-    // Cleanup
+    // Nettoyage quand le composant est démonté
     return () => {
       map.current?.remove();
     };
   }, []);
+
 
   // Fetch initial reports
   useEffect(() => {
