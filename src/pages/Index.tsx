@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 
+type VolunteerStatus = 'available' | 'offline';
+
 const resources = [
   {
     title: "Guide des premiers secours",
@@ -38,6 +40,7 @@ const resources = [
 
 const Index = () => {
   const [latestReportId, setLatestReportId] = useState<string | null>(null);
+  const [volunteerStatus, setVolunteerStatus] = useState<VolunteerStatus | null>(null);
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -59,6 +62,30 @@ const Index = () => {
 
     fetchLatestReport();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetchVolunteerStatus();
+    }
+  }, [user]);
+
+  const fetchVolunteerStatus = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('volunteers')
+      .select('availability')
+      .eq('user_id', user.id)
+      .single();
+
+    if (!error && data) {
+      // Ensure we only set allowed status values
+      const status = data.availability === 'available' ? 'available' : 'offline';
+      setVolunteerStatus(status);
+    } else {
+      setVolunteerStatus(null);
+    }
+  };
 
   const handleVolunteerClick = async () => {
     if (!user) {
@@ -87,6 +114,7 @@ const Index = () => {
 
         if (updateError) throw updateError;
 
+        setVolunteerStatus('available');
         toast({
           description: "Vous êtes maintenant disponible pour aider",
         });
@@ -103,6 +131,7 @@ const Index = () => {
 
         if (createError) throw createError;
 
+        setVolunteerStatus('available');
         toast({
           description: "Votre profil volontaire a été créé. Veuillez configurer vos compétences dans votre profil.",
         });
