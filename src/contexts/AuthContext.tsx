@@ -31,28 +31,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-
-      // If user is logging out, update volunteer status to unavailable
-      if (!session?.user && user) {
-        try {
-          const { error } = await supabase
-            .from('volunteers')
-            .update({ availability: 'offline' })
-            .eq('user_id', user.id);
-
-          if (error) throw error;
-        } catch (error) {
-          console.error('Error updating volunteer status:', error);
-        }
-      }
     });
 
     return () => subscription.unsubscribe();
-  }, [user]);
+  }, []);
 
   const value = {
     session,
@@ -73,20 +59,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) throw error;
     },
     signOut: async () => {
-      if (user) {
-        try {
-          // Update volunteer status to offline before signing out
-          const { error: volunteerError } = await supabase
-            .from('volunteers')
-            .update({ availability: 'offline' })
-            .eq('user_id', user.id);
-
-          if (volunteerError) throw volunteerError;
-        } catch (error) {
-          console.error('Error updating volunteer status:', error);
-        }
-      }
-      
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
     },
