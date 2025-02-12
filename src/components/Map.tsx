@@ -23,7 +23,8 @@ const Map = () => {
   const map = useRef<mapboxgl.Map | null>(null);
   const [reports, setReports] = useState<Report[]>([]);
   const modalRef = useRef<HTMLDivElement>(null);
-
+  let latitude = 0;
+  let longitude = 0;
   // Handle click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -78,8 +79,8 @@ const Map = () => {
       // Get user's geolocation
       navigator.geolocation.getCurrentPosition(
           async (position) => {
-            const { latitude, longitude } = position.coords;
-            // Update the map center (longitude first, then latitude)
+            latitude = position.coords.latitude;
+            longitude = position.coords.longitude;
             map.current?.setCenter([longitude, latitude]);
 
             // Fetch the user's profile
@@ -215,9 +216,35 @@ const Map = () => {
     });
   }, [reports]);
 
+  // Center map on current location
+  const centerOnCurrentLocation = () => {
+    //if latitude and longitude are not null
+    if (latitude && longitude) {
+      map.current?.setCenter([longitude, latitude]);
+    }
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+          latitude = position.coords.latitude;
+          longitude = position.coords.longitude;
+          map.current?.setCenter([longitude, latitude]);
+        },
+        (error) => {
+          console.error('Geolocation error:', error);
+        }
+    );
+  };
+
   return (
       <div className="relative w-full h-[600px] bg-gray-100 rounded-lg overflow-hidden">
         <div ref={mapContainer} className="absolute inset-0" />
+
+        {/* Center on Current Location Button */}
+        <button
+            onClick={centerOnCurrentLocation}
+            className="absolute top-4 left-4 z-10 p-2 bg-white rounded shadow-md"
+        >
+          Centrer sur ma position
+        </button>
 
         {/* Emergency Form Modal */}
         {showForm && (
