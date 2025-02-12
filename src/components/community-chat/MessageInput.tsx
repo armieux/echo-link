@@ -61,8 +61,8 @@ export default function MessageInput({
         .from('messages')
         .getPublicUrl(filePath);
 
-      // Add image URL to message
-      setNewMessage(prev => prev + ` ${publicUrl} `);
+      // Add image URL to message - Fixed the type error here
+      setNewMessage(newMessage + ` ${publicUrl} `);
 
     } catch (error) {
       console.error('Error uploading image:', error);
