@@ -1,7 +1,4 @@
 
--- Enable PostGIS extension for geographical data
-CREATE EXTENSION IF NOT EXISTS postgis;
-
 -- First create the enum type for volunteer status
 CREATE TYPE volunteer_status AS ENUM ('available', 'busy', 'offline');
 
