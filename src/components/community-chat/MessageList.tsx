@@ -15,8 +15,10 @@ interface UserInfo {
 export default function MessageList({ messages }: MessageListProps) {
   const { user } = useAuth();
   const messageEndRef = useRef<HTMLDivElement>(null);
+  const messageListRef = useRef<HTMLDivElement>(null);
   const [usernames, setUsernames] = useState<UserInfo>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
 
   useEffect(() => {
     const fetchUsernames = async () => {
@@ -55,10 +57,34 @@ export default function MessageList({ messages }: MessageListProps) {
   }, [messages]);
 
   useEffect(() => {
-    if (messageEndRef.current) {
+    const handleScroll = () => {
+      if (messageListRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } = messageListRef.current;
+        if (scrollHeight - scrollTop === clientHeight) {
+          setIsUserScrolling(false);
+        } else {
+          setIsUserScrolling(true);
+        }
+      }
+    };
+
+    const messageList = messageListRef.current;
+    if (messageList) {
+      messageList.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      if (messageList) {
+        messageList.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isUserScrolling && messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages]);
+  }, [messages, isUserScrolling]);
 
   const renderMessageContent = (text: string) => {
     const parts = text.split(/\s+/);
@@ -103,7 +129,7 @@ export default function MessageList({ messages }: MessageListProps) {
   }
 
   return (
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div ref={messageListRef} className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
             <div
                 key={message.id}
