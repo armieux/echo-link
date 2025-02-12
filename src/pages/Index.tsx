@@ -79,6 +79,7 @@ const Index = () => {
       .single();
 
     if (!error && data) {
+      // Ensure we only set allowed status values
       const status = data.availability === 'available' ? 'available' : 'offline';
       setVolunteerStatus(status);
     } else {
@@ -105,21 +106,17 @@ const Index = () => {
         .single();
 
       if (existingVolunteer) {
-        // Toggle availability
-        const newAvailability: VolunteerStatus = existingVolunteer.availability === 'available' ? 'offline' : 'available';
-        
+        // Update availability to available
         const { error: updateError } = await supabase
           .from('volunteers')
-          .update({ availability: newAvailability })
+          .update({ availability: 'available' })
           .eq('id', existingVolunteer.id);
 
         if (updateError) throw updateError;
 
-        setVolunteerStatus(newAvailability);
+        setVolunteerStatus('available');
         toast({
-          description: newAvailability === 'available' 
-            ? "Vous êtes maintenant disponible pour aider"
-            : "Vous n'êtes plus disponible pour aider",
+          description: "Vous êtes maintenant disponible pour aider",
         });
       } else {
         // Create new volunteer entry with default location
@@ -166,13 +163,9 @@ const Index = () => {
               <div className="flex justify-center">
                 <Button 
                   onClick={handleVolunteerClick}
-                  className={volunteerStatus === 'available' 
-                    ? "bg-gray-500 hover:bg-gray-600" 
-                    : "bg-emergency hover:bg-emergency/90"}
+                  className="bg-emergency hover:bg-emergency/90"
                 >
-                  {volunteerStatus === 'available' 
-                    ? "Ne plus proposer mon aide"
-                    : "Proposer mon aide"}
+                  Proposer mon aide
                 </Button>
               </div>
             )}

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -52,7 +53,6 @@ const Map = () => {
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    // Créez la carte une seule fois
     if (!map.current) {
       const token = import.meta.env.VITE_MAPBOX_TOKEN;
       if (!token) {
@@ -62,32 +62,26 @@ const Map = () => {
 
       mapboxgl.accessToken = token;
 
-      // Initialisation de la carte
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/streets-v12',
-        center: [2.3522, 48.8566], // coordonnées par défaut (Paris)
+        center: [2.3522, 48.8566],
         zoom: 11
       });
 
-      // Ajout de contrôles de navigation
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-      // Récupération de la géolocalisation de l'utilisateur
       navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            // Mise à jour du centre de la carte (longitude d'abord, latitude ensuite)
-            map.current?.setCenter([longitude, latitude]);
-          },
-          (error) => {
-            console.error('Erreur de géolocalisation:', error);
-            // Vous pouvez laisser la carte centrée sur Paris ou gérer un fallback
-          }
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          map.current?.setCenter([longitude, latitude]);
+        },
+        (error) => {
+          console.error('Erreur de géolocalisation:', error);
+        }
       );
     }
 
-    // Nettoyage quand le composant est démonté
     return () => {
       map.current?.remove();
     };
@@ -124,7 +118,6 @@ const Map = () => {
           table: 'reports'
         },
         async (payload) => {
-          // Fetch all reports again to ensure consistency
           const { data, error } = await supabase
             .from('reports')
             .select('*')
@@ -164,7 +157,6 @@ const Map = () => {
         return '#00FF00';
       };
 
-      // Create marker element
       const el = document.createElement('div');
       el.className = 'marker';
       el.style.width = '24px';
@@ -175,7 +167,6 @@ const Map = () => {
       el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
       el.style.cursor = 'pointer';
 
-      // Add popup
       const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
         <div class="p-2">
           <h3 class="font-bold">${report.title}</h3>
@@ -187,7 +178,6 @@ const Map = () => {
         </div>
       `);
 
-      // Add marker to map
       new mapboxgl.Marker(el)
         .setLngLat([report.longitude, report.latitude])
         .setPopup(popup)
