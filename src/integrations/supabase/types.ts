@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          image_url: string | null
           message_text: string
           region: string | null
           topic: Database["public"]["Enums"]["chat_topic"]
@@ -21,6 +22,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          image_url?: string | null
           message_text: string
           region?: string | null
           topic: Database["public"]["Enums"]["chat_topic"]
@@ -29,6 +31,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          image_url?: string | null
           message_text?: string
           region?: string | null
           topic?: Database["public"]["Enums"]["chat_topic"]
@@ -163,6 +166,7 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
+          image_url: string | null
           message_text: string
           report_id: string | null
           user_id: string | null
@@ -170,6 +174,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
+          image_url?: string | null
           message_text: string
           report_id?: string | null
           user_id?: string | null
@@ -177,6 +182,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string
+          image_url?: string | null
           message_text?: string
           report_id?: string | null
           user_id?: string | null
