@@ -2,9 +2,13 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = "https://pondziaqsdxoxefzbssy.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBvbmR6aWFxc2R4b3hlZnpic3N5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxNzU5MDMsImV4cCI6MjA1NDc1MTkwM30.S36dD85rIaXOoYZx12twXKOKbe7AH300gi0WQb0qCO4";
+//const SUPABASE_URL = "https://pondziaqsdxoxefzbssy.supabase.co";
+//const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBvbmR6aWFxc2R4b3hlZnpic3N5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxNzU5MDMsImV4cCI6MjA1NDc1MTkwM30.S36dD85rIaXOoYZx12twXKOKbe7AH300gi0WQb0qCO4";
 
+const SUPABASE_URL = "https://supabasekong-tcskck80co8swscks0c08ksg.apps.armieux.fr";
+const SUPABASE_PUBLISHABLE_KEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTczOTM1MDQ0MCwiZXhwIjo0ODk1MDI0MDQwLCJyb2xlIjoic2VydmljZV9yb2xlIn0.23JS8UocRlTt1NrUNR9ChIGOBrXqJEMtB7oh1LePq1U";
+
+//const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '';
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
