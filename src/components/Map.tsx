@@ -3,6 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import EmergencyForm from "./EmergencyForm";
 import { supabase } from "@/integrations/supabase/client";
+import {useAuth} from "@/contexts/AuthContext.tsx";
 
 interface Report {
   id: string;
@@ -16,6 +17,7 @@ interface Report {
 }
 
 const Map = () => {
+
   const [showForm, setShowForm] = useState(false);
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -52,7 +54,7 @@ const Map = () => {
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    // Créez la carte une seule fois
+    // Create the map only once
     if (!map.current) {
       const token = import.meta.env.VITE_MAPBOX_TOKEN;
       if (!token) {
@@ -62,32 +64,50 @@ const Map = () => {
 
       mapboxgl.accessToken = token;
 
-      // Initialisation de la carte
+      // Initialize the map
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/streets-v12',
-        center: [2.3522, 48.8566], // coordonnées par défaut (Paris)
+        center: [5.3522, 42.8566], // default coordinates (Paris)
         zoom: 11
       });
 
-      // Ajout de contrôles de navigation
+      // Add navigation controls
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-      // Récupération de la géolocalisation de l'utilisateur
+      // Get user's geolocation
       navigator.geolocation.getCurrentPosition(
-          (position) => {
+          async (position) => {
             const { latitude, longitude } = position.coords;
-            // Mise à jour du centre de la carte (longitude d'abord, latitude ensuite)
+            // Update the map center (longitude first, then latitude)
             map.current?.setCenter([longitude, latitude]);
+
+            // Fetch the user's profile
+            const { data: data, error: userError } = await supabase.auth.getUser();
+            if (userError) {
+              console.error('Error fetching user:', userError);
+              return;
+            }
+            console.log(data);
+
+            // Update the user's profile with the new location
+            const { error: updateError } = await supabase
+                .from('profiles')
+                .update({ location: `POINT(${longitude} ${latitude})` })
+                .eq('id', data.user.id);
+
+            if (updateError) {
+              console.error('Error updating user location:', updateError);
+            }
           },
           (error) => {
-            console.error('Erreur de géolocalisation:', error);
-            // Vous pouvez laisser la carte centrée sur Paris ou gérer un fallback
+            console.error('Geolocation error:', error);
+            // You can leave the map centered on Paris or handle a fallback
           }
       );
     }
 
-    // Nettoyage quand le composant est démonté
+    // Cleanup when the component is unmounted
     return () => {
       map.current?.remove();
     };
@@ -97,9 +117,9 @@ const Map = () => {
   useEffect(() => {
     const fetchReports = async () => {
       const { data, error } = await supabase
-        .from('reports')
-        .select('*')
-        .order('created_at', { ascending: false });
+          .from('reports')
+          .select('*')
+          .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching reports:', error);
@@ -115,30 +135,30 @@ const Map = () => {
   // Subscribe to real-time updates
   useEffect(() => {
     const channel = supabase
-      .channel('reports-channel')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'reports'
-        },
-        async (payload) => {
-          // Fetch all reports again to ensure consistency
-          const { data, error } = await supabase
-            .from('reports')
-            .select('*')
-            .order('created_at', { ascending: false });
+        .channel('reports-channel')
+        .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'reports'
+            },
+            async (payload) => {
+              // Fetch all reports again to ensure consistency
+              const { data, error } = await supabase
+                  .from('reports')
+                  .select('*')
+                  .order('created_at', { ascending: false });
 
-          if (error) {
-            console.error('Error fetching reports:', error);
-            return;
-          }
+              if (error) {
+                console.error('Error fetching reports:', error);
+                return;
+              }
 
-          setReports(data);
-        }
-      )
-      .subscribe();
+              setReports(data);
+            }
+        )
+        .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
@@ -189,25 +209,25 @@ const Map = () => {
 
       // Add marker to map
       new mapboxgl.Marker(el)
-        .setLngLat([report.longitude, report.latitude])
-        .setPopup(popup)
-        .addTo(map.current!);
+          .setLngLat([report.longitude, report.latitude])
+          .setPopup(popup)
+          .addTo(map.current!);
     });
   }, [reports]);
 
   return (
-    <div className="relative w-full h-[600px] bg-gray-100 rounded-lg overflow-hidden">
-      <div ref={mapContainer} className="absolute inset-0" />
-      
-      {/* Emergency Form Modal */}
-      {showForm && (
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div ref={modalRef} className="w-full max-w-md max-h-[80vh] bg-white rounded-lg shadow-xl overflow-y-auto">
-            <EmergencyForm onClose={() => setShowForm(false)} />
-          </div>
-        </div>
-      )}
-    </div>
+      <div className="relative w-full h-[600px] bg-gray-100 rounded-lg overflow-hidden">
+        <div ref={mapContainer} className="absolute inset-0" />
+
+        {/* Emergency Form Modal */}
+        {showForm && (
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+              <div ref={modalRef} className="w-full max-w-md max-h-[80vh] bg-white rounded-lg shadow-xl overflow-y-auto">
+                <EmergencyForm onClose={() => setShowForm(false)} />
+              </div>
+            </div>
+        )}
+      </div>
   );
 };
 

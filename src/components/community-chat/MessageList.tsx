@@ -1,4 +1,3 @@
-
 import { useRef, useEffect, useState } from 'react';
 import type { CommunityMessage } from '@/types/community-chat';
 import { useAuth } from '@/contexts/AuthContext';
@@ -7,24 +6,17 @@ import { Loader2 } from 'lucide-react';
 
 interface MessageListProps {
   messages: CommunityMessage[];
-  shoulScroll: boolean; // Keep the typo for compatibility
 }
 
 interface UserInfo {
   [key: string]: string;
 }
 
-export default function MessageList({ messages, shoulScroll = false }: MessageListProps) {
+export default function MessageList({ messages }: MessageListProps) {
   const { user } = useAuth();
   const messageEndRef = useRef<HTMLDivElement>(null);
   const [usernames, setUsernames] = useState<UserInfo>({});
   const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    if (shoulScroll) {
-      messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages, shoulScroll]);
 
   useEffect(() => {
     const fetchUsernames = async () => {
@@ -33,7 +25,6 @@ export default function MessageList({ messages, shoulScroll = false }: MessageLi
       const userInfoMap: UserInfo = {};
 
       try {
-        // Fetch usernames for all unique user IDs
         const { data, error } = await supabase
             .from('profiles')
             .select('id, username')
@@ -63,37 +54,40 @@ export default function MessageList({ messages, shoulScroll = false }: MessageLi
     }
   }, [messages]);
 
+  useEffect(() => {
+    if (messageEndRef.current) {
+      messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+
   const renderMessageContent = (text: string) => {
-    // Split text into parts (URLs, image URLs, and regular text)
     const parts = text.split(/\s+/);
-    
+
     return parts.map((part, index) => {
-      // Check if part is a URL
       const isUrl = /^(https?:\/\/[^\s]+)$/.test(part);
-      // Check if part is an image URL (simple check for common extensions)
       const isImage = isUrl && /\.(jpg|jpeg|png|gif|webp)$/i.test(part);
 
       if (isImage) {
         return (
-          <img 
-            key={index}
-            src={part}
-            alt="Message attachment"
-            className="max-w-full h-auto rounded-lg my-2"
-            loading="lazy"
-          />
+            <img
+                key={index}
+                src={part}
+                alt="Message attachment"
+                className="max-w-full h-auto rounded-lg my-2"
+                loading="lazy"
+            />
         );
       } else if (isUrl) {
         return (
-          <a
-            key={index}
-            href={part}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:underline break-all"
-          >
-            {part}
-          </a>
+            <a
+                key={index}
+                href={part}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline break-all"
+            >
+              {part}
+            </a>
         );
       }
       return <span key={index}>{part} </span>;
@@ -102,46 +96,46 @@ export default function MessageList({ messages, shoulScroll = false }: MessageLi
 
   if (isLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center p-4">
-        <Loader2 className="h-8 w-8 animate-spin text-emergency" />
-      </div>
+        <div className="flex-1 flex items-center justify-center p-4">
+          <Loader2 className="h-8 w-8 animate-spin text-emergency" />
+        </div>
     );
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4">
-      {messages.map((message) => (
-        <div
-          key={message.id}
-          className={`flex ${
-            message.user_id === user?.id ? 'justify-end' : 'justify-start'
-          }`}
-        >
-          <div
-            className={`max-w-[80%] rounded-lg overflow-hidden ${
-              message.user_id === user?.id
-                ? 'bg-emergency text-white'
-                : 'bg-gray-100'
-            }`}
-          >
-            <div className="px-3 pt-2 text-xs font-medium opacity-75">
-              {usernames[message.user_id] || 'Chargement...'}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map((message) => (
+            <div
+                key={message.id}
+                className={`flex ${
+                    message.user_id === user?.id ? 'justify-end' : 'justify-start'
+                }`}
+            >
+              <div
+                  className={`max-w-[80%] rounded-lg overflow-hidden ${
+                      message.user_id === user?.id
+                          ? 'bg-emergency text-white'
+                          : 'bg-gray-100'
+                  }`}
+              >
+                <div className="px-3 pt-2 text-xs font-medium opacity-75">
+                  {usernames[message.user_id] || 'Chargement...'}
+                </div>
+                <div className="p-3 pt-1">
+                  <p className="text-sm break-words">
+                    {renderMessageContent(message.message_text)}
+                  </p>
+                  <p className="text-xs mt-1 opacity-70">
+                    {new Date(message.created_at).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="p-3 pt-1">
-              <p className="text-sm break-words">
-                {renderMessageContent(message.message_text)}
-              </p>
-              <p className="text-xs mt-1 opacity-70">
-                {new Date(message.created_at).toLocaleTimeString([], { 
-                  hour: '2-digit', 
-                  minute: '2-digit' 
-                })}
-              </p>
-            </div>
-          </div>
-        </div>
-      ))}
-      <div ref={messageEndRef} />
-    </div>
+        ))}
+        <div ref={messageEndRef} />
+      </div>
   );
 }
