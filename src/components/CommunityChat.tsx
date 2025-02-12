@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,8 +47,7 @@ export default function CommunityChat() {
               : undefined
         },
         (payload) => {
-          const newMessage = payload.new as CommunityMessage;
-          setMessages(prev => [...prev, newMessage]);
+          setMessages(prev => [...prev, payload.new as CommunityMessage]);
         }
       )
       .subscribe();
@@ -55,7 +55,7 @@ export default function CommunityChat() {
     setChannel(channel);
 
     return () => {
-      channel.unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, [activeTab, selectedTopic, selectedRegion, selectedReport]);
 
