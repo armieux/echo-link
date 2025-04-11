@@ -1,69 +1,73 @@
-# Welcome to your Lovable project
+# Echo Link
 
-## Project info
+**Echo Link** est une application web développée avec **React**, **TypeScript**, et **Vite**. Elle permet aux utilisateurs de signaler des urgences, de collaborer avec des volontaires, et d'accéder à des ressources utiles. L'application utilise **Supabase** pour la gestion des données et l'authentification, ainsi que **TailwindCSS** pour le style.
 
-**URL**: https://lovable.dev/projects/4040e02c-8d33-418d-aad0-26462edeadea
+## Fonctionnalités
 
-## How can I edit this code?
+- **Signalement d'urgences** : Les utilisateurs peuvent soumettre des signalements d'urgence avec des détails tels que le titre, la description, la catégorie, la priorité et leur position géographique.
+- **Notification des volontaires** : Les volontaires proches reçoivent des notifications pour les signalements d'urgence.
+- **Carte interactive** : Une carte intégrée permet de visualiser les signalements et les ressources.
+- **Chat communautaire** : Un espace de discussion pour les utilisateurs.
+- **Assistant IA** : Fournit des réponses et des suggestions basées sur les besoins des utilisateurs.
+- **Vérification d'identité** : Assure la sécurité et la fiabilité des utilisateurs.
+- **Ressources utiles** : Accès à des informations et outils pertinents.
 
-There are several ways of editing your application.
+## Prérequis
 
-**Use Lovable**
+- **Node.js** (version 18 ou supérieure)
+- **bun** (gestionnaire de paquets)
+- Une clé API pour **Supabase**
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/4040e02c-8d33-418d-aad0-26462edeadea) and start prompting.
+## Installation
 
-Changes made via Lovable will be committed automatically to this repo.
+1. Clonez le dépôt :
 
-**Use your preferred IDE**
+   ```bash
+   git clone <URL_DU_DEPOT>
+   cd echo-link
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. Installez les dépendances avec `bun` :
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+   ```bash
+   bun install
+   ```
 
-Follow these steps:
+3. Configurez les variables d'environnement dans un fichier `.env` :
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+   ```env
+   VITE_SUPABASE_URL=<votre_url_supabase>
+   VITE_SUPABASE_ANON_KEY=<votre_cle_anon_supabase>
+   ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+4. Lancez le serveur de développement :
 
-# Step 3: Install the necessary dependencies.
-npm i
+   ```bash
+   bun run dev
+   ```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+5. Accédez à l'application à l'adresse `http://localhost:5173`.
 
-**Edit a file directly in GitHub**
+## Scripts
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- `bun run dev` : Lance le serveur de développement.
+- `bun run build` : Génère une version de production.
+- `bun run build:dev` : Génère une version de développement.
+- `bun run lint` : Analyse le code avec ESLint.
+- `bun run preview` : Prévisualise la version de production.
 
-**Use GitHub Codespaces**
+## Technologies utilisées
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- **React** : Framework JavaScript pour la création d'interfaces utilisateur.
+- **TypeScript** : Superset de JavaScript pour un typage statique.
+- **Vite** : Outil de build rapide pour les projets modernes.
+- **Supabase** : Backend-as-a-Service pour la base de données et l'authentification.
+- **TailwindCSS** : Framework CSS utilitaire pour le style.
 
-## What technologies are used for this project?
+## Contribution
 
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/4040e02c-8d33-418d-aad0-26462edeadea) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+1. Forkez le projet.
+2. Créez une branche pour votre fonctionnalité ou correction de bug : `git checkout -b feature/nom-fonctionnalite`.
+3. Effectuez vos modifications et commitez-les : `git commit -m "Ajout de la fonctionnalité X"`.
+4. Poussez vos modifications : `git push origin feature/nom-fonctionnalite`.
+5. Ouvrez une Pull Request.
