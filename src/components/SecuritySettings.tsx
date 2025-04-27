@@ -5,7 +5,7 @@ import { Skeleton } from "./ui/skeleton";
 
 interface SecuritySettingsProps {
   isVerified: boolean;
-  verificationStatus: "pending" | "verified" | "rejected";
+  verificationStatus: null | "pending" | "verified" | "rejected";
   documentSubmissionDate?: string;
   rejectionReason?: string;
   isLoading?: boolean;
@@ -40,8 +40,14 @@ const SecuritySettings = ({
           <h3 className="text-lg font-medium mb-2">Statut de vérification</h3>
           <div className="flex items-center gap-3 mb-4">
             <VerificationBadge isVerified={isVerified} />
-            {verificationStatus === "pending" && (
-              <span className="text-yellow-600 text-sm flex items-center gap-1">
+            {verificationStatus === null && (
+                <span className="text-yellow-600 text-sm flex items-center gap-1">
+                <AlertCircleIcon className="w-4 h-4" />
+                Veuillez soumettre vos documents
+              </span>
+                        )}
+                        {verificationStatus === "pending" && documentSubmissionDate && (
+                            <span className="text-yellow-600 text-sm flex items-center gap-1">
                 <AlertCircleIcon className="w-4 h-4" />
                 En attente de validation
               </span>

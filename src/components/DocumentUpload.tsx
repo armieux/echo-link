@@ -1,5 +1,5 @@
 
-import { useCallback, useState } from "react";
+import {useCallback, useEffect, useState} from "react";
 import { UploadIcon, CameraIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { toast } from "@/hooks/use-toast";
@@ -72,7 +72,7 @@ const DocumentUpload = ({
   };
 
   // Set preview for existing file
-  useState(() => {
+  useEffect(() => {
     if (existingFile) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -80,7 +80,7 @@ const DocumentUpload = ({
       };
       reader.readAsDataURL(existingFile);
     }
-  });
+  }, [existingFile]);
 
   if (isLoading) {
     return (
@@ -116,7 +116,7 @@ const DocumentUpload = ({
           if (file) handleFile(file);
         }}
       />
-      
+
       <div className="text-center">
         {preview ? (
           <img
@@ -129,7 +129,7 @@ const DocumentUpload = ({
             {type === "id" ? <UploadIcon className="w-full h-full" /> : <CameraIcon className="w-full h-full" />}
           </div>
         )}
-        
+
         <h3 className="text-lg font-medium mb-1">
           {type === "id" ? "Pièce d'identité" : "Selfie"}
         </h3>
