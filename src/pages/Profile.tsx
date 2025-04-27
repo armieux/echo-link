@@ -126,18 +126,51 @@ export default function Profile() {
   const updateProfile = async () => {
     if (!user) return;
 
-    const { error } = await supabase
-      .from("profiles")
-      .update({ username })
-      .eq("id", user.id);
+    // Check if profile exists
+    const { data: existingProfile, error: fetchError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("id", user.id)
+        .single();
 
-    if (error) {
+    if (fetchError && fetchError.code !== 'PGRST116') {
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: "Impossible de mettre à jour le profil",
+        description: "Impossible de vérifier le profil",
       });
       return;
+    }
+
+    if (existingProfile) {
+      // Update existing profile
+      const { error: updateError } = await supabase
+          .from("profiles")
+          .update({ username })
+          .eq("id", user.id);
+
+      if (updateError) {
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Impossible de mettre à jour le profil",
+        });
+        return;
+      }
+    } else {
+      // Create new profile
+      const { error: createError } = await supabase
+          .from("profiles")
+          .insert({ id: user.id, username, avatar_url: null, rating: 0 });
+
+      if (createError) {
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Impossible de créer le profil",
+        });
+        return;
+      }
     }
 
     setIsEditing(false);
