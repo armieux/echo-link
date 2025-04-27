@@ -13,22 +13,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '23'
+          node-version: '23' # Use the Node.js version compatible with your project
       - name: Install dependencies
         run: npm install
       - name: Run tests
-        run: npm test -- --outputFile=test-results.json --json
-      - name: Archive test results
-        if: always()
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: test-results
-          path: test-results.json
-
+        run: npm test
       - uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
