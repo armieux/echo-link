@@ -89,7 +89,6 @@ const Map = () => {
               console.error('Error fetching user:', userError);
               return;
             }
-            console.log(data);
 
             // Update the user's profile with the new location
             const { error: updateError } = await supabase
