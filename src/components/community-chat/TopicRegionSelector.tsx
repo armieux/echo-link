@@ -1,4 +1,4 @@
-
+import { useState } from 'react';
 import {
   Select,
   SelectContent,
@@ -41,48 +41,48 @@ interface TopicRegionSelectorProps {
 }
 
 export default function TopicRegionSelector({
-  selectedTopic,
-  setSelectedTopic,
-  selectedRegion,
-  setSelectedRegion
-}: TopicRegionSelectorProps) {
+                                              selectedTopic,
+                                              setSelectedTopic,
+                                              selectedRegion = REGIONS[0],
+                                              setSelectedRegion
+                                            }: TopicRegionSelectorProps) {
   return (
-    <div className="flex gap-4">
-      <Select
-        value={selectedTopic}
-        onValueChange={(value: ChatTopic) => {
-          setSelectedTopic(value);
-        }}
-      >
-        <SelectTrigger className="w-[200px]">
-          <SelectValue placeholder="Choisir un thème" />
-        </SelectTrigger>
-        <SelectContent>
-          {TOPICS.map(topic => (
-            <SelectItem key={topic.value} value={topic.value}>
-              {topic.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="flex gap-4">
+        <Select
+            value={selectedTopic}
+            onValueChange={(value: ChatTopic) => {
+              setSelectedTopic(value);
+            }}
+        >
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Choisir un thème" />
+          </SelectTrigger>
+          <SelectContent>
+            {TOPICS.map(topic => (
+                <SelectItem key={topic.value} value={topic.value}>
+                  {topic.label}
+                </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-      <Select
-        value={selectedRegion}
-        onValueChange={(value: string) => {
-          setSelectedRegion(value);
-        }}
-      >
-        <SelectTrigger className="w-[200px]">
-          <SelectValue placeholder="Choisir une région" />
-        </SelectTrigger>
-        <SelectContent>
-          {REGIONS.map(region => (
-            <SelectItem key={region} value={region}>
-              {region}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+        <Select
+            value={selectedRegion}
+            onValueChange={(value: string) => {
+              setSelectedRegion(value);
+            }}
+        >
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Choisir une région" />
+          </SelectTrigger>
+          <SelectContent>
+            {REGIONS.map(region => (
+                <SelectItem key={region} value={region}>
+                  {region}
+                </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
   );
 }

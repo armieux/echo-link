@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { RealtimeChannel } from '@supabase/supabase-js';
@@ -9,6 +9,7 @@ import TopicRegionSelector from './community-chat/TopicRegionSelector';
 import MessageList from './community-chat/MessageList';
 import MessageInput from './community-chat/MessageInput';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function CommunityChat() {
   const { user } = useAuth();
@@ -21,14 +22,33 @@ export default function CommunityChat() {
   const [activeTab, setActiveTab] = useState('community');
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
   const [reports, setReports] = useState<any[]>([]);
+  const scrollAreaRef = useRef<HTMLDivElement | null>(null);
+  
+  const scrollToBottom = () => {
+    if (!scrollAreaRef.current) return;
+
+    // Get the viewport element via data-radix-scroll-area-viewport
+    const viewportElement = scrollAreaRef.current.querySelector<HTMLElement>(
+      "[data-radix-scroll-area-viewport]"
+    );
+
+    if (viewportElement) {
+      viewportElement.scrollTo({
+        top: viewportElement.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  };
 
   useEffect(() => {
+    // Load messages only when selectedTopic or selectedRegion changes
     if (activeTab === 'community') {
       loadCommunityMessages();
     } else {
       loadReportMessages();
     }
 
+    // Set up real-time subscription
     const channel = supabase
         .channel('chat')
         .on(
@@ -43,10 +63,18 @@ export default function CommunityChat() {
                       : `topic=eq.${selectedTopic}`
                   : selectedReport
                       ? `report_id=eq.${selectedReport}`
-                      : undefined
+                      : undefined,
             },
             (payload) => {
-              setMessages(prev => [...prev, payload.new as CommunityMessage]);
+              setMessages((prev) => {
+                const isDuplicate = prev.some((msg) => msg.id === payload.new.id);
+                if (isDuplicate) return prev;
+
+                return [...prev, payload.new as CommunityMessage];
+              });
+
+              // Scroll to bottom when a new message arrives
+              setTimeout(scrollToBottom, 100);
             }
         )
         .subscribe();
@@ -151,12 +179,12 @@ export default function CommunityChat() {
             message_text: newMessage.trim(),
             topic: selectedTopic,
             region: selectedRegion,
-            user_id: user.id
+            user_id: user.id,
           }
           : {
             message_text: newMessage.trim(),
             report_id: selectedReport,
-            user_id: user.id
+            user_id: user.id,
           };
 
       const { data, error } = await supabase
@@ -171,10 +199,12 @@ export default function CommunityChat() {
         description: "Message envoyé",
       });
 
-      // Update messages state with the new message
+      // Append the new message to the messages state
       if (data && data.length > 0) {
         const newMsg = data[0] as CommunityMessage;
-        setMessages(prev => [...prev, newMsg]);
+        setMessages((prev) => [...prev, newMsg]);
+        // Scroll to bottom after sending a message
+        setTimeout(scrollToBottom, 100);
       }
     } catch (error) {
       toast({
@@ -233,12 +263,25 @@ export default function CommunityChat() {
           </div>
         </Tabs>
 
-        <div className="flex-1 overflow-hidden">
-          <MessageList
-              messages={messages}
-              shoulScroll={true}
-          />
-        </div>
+        <ScrollArea ref={scrollAreaRef} className="flex-1">
+          {activeTab === 'community' ? (
+              (selectedTopic && selectedRegion) ? (
+                  <MessageList messages={messages} shouldScroll={false} />
+              ) : (
+                  <div className="flex items-center justify-center h-full text-gray-500">
+                    Veuillez sélectionner un sujet et une région pour afficher les messages.
+                  </div>
+              )
+          ) : (
+              selectedReport ? (
+                  <MessageList messages={messages} shouldScroll={false} />
+              ) : (
+                  <div className="flex items-center justify-center h-full text-gray-500">
+                    Sélectionner un signalement
+                  </div>
+              )
+          )}
+        </ScrollArea>
 
         <MessageInput
             newMessage={newMessage}

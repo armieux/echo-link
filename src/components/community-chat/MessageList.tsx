@@ -6,13 +6,14 @@ import { Loader2 } from 'lucide-react';
 
 interface MessageListProps {
   messages: CommunityMessage[];
+  shouldScroll?: boolean; // Fixed the typo from 'shoulScroll' to 'shouldScroll'
 }
 
 interface UserInfo {
   [key: string]: string;
 }
 
-export default function MessageList({ messages }: MessageListProps) {
+export default function MessageList({ messages, shouldScroll = true }: MessageListProps) {
   const { user } = useAuth();
   const messageEndRef = useRef<HTMLDivElement>(null);
   const messageListRef = useRef<HTMLDivElement>(null);
@@ -56,35 +57,6 @@ export default function MessageList({ messages }: MessageListProps) {
     }
   }, [messages]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (messageListRef.current) {
-        const { scrollTop, scrollHeight, clientHeight } = messageListRef.current;
-        if (scrollHeight - scrollTop === clientHeight) {
-          setIsUserScrolling(false);
-        } else {
-          setIsUserScrolling(true);
-        }
-      }
-    };
-
-    const messageList = messageListRef.current;
-    if (messageList) {
-      messageList.addEventListener('scroll', handleScroll);
-    }
-
-    return () => {
-      if (messageList) {
-        messageList.removeEventListener('scroll', handleScroll);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isUserScrolling && messageEndRef.current) {
-      messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages, isUserScrolling]);
 
   const renderMessageContent = (text: string) => {
     const parts = text.split(/\s+/);
@@ -129,7 +101,7 @@ export default function MessageList({ messages }: MessageListProps) {
   }
 
   return (
-      <div ref={messageListRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div ref={messageListRef} className="p-4 space-y-4">
         {messages.map((message) => (
             <div
                 key={message.id}
