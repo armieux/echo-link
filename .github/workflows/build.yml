@@ -5,22 +5,28 @@ on:
     branches:
       - main
 
-
 jobs:
   build:
-    name: Build and analyze
+    name: Build, test, and analyze
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '23' # Use the Node.js version compatible with your project
+      - name: Install dependencies
+        run: npm install
+      - name: Run tests
+        run: npm test
       - uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      # If you wish to fail your job when the Quality Gate is red, uncomment the
-      # following lines. This would typically be used to fail a deployment.
+      # Uncomment the following lines to fail the job if the Quality Gate is red
       # - uses: sonarsource/sonarqube-quality-gate-action@master
       #   timeout-minutes: 5
       #   env:
