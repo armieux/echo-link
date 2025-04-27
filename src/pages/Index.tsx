@@ -97,48 +97,57 @@ const Index = () => {
     }
 
     try {
-      // First check if volunteer entry exists
       const { data: existingVolunteer } = await supabase
-        .from('volunteers')
-        .select('id, availability')
-        .eq('user_id', user.id)
-        .single();
+          .from('volunteers')
+          .select('id, availability')
+          .eq('user_id', user.id)
+          .single();
 
       if (existingVolunteer) {
-        // Toggle availability
         const newAvailability: VolunteerStatus = existingVolunteer.availability === 'available' ? 'offline' : 'available';
-        
+
         const { error: updateError } = await supabase
-          .from('volunteers')
-          .update({ availability: newAvailability })
-          .eq('id', existingVolunteer.id);
+            .from('volunteers')
+            .update({ availability: newAvailability })
+            .eq('id', existingVolunteer.id);
 
         if (updateError) throw updateError;
 
         setVolunteerStatus(newAvailability);
         toast({
-          description: newAvailability === 'available' 
-            ? "Vous êtes maintenant disponible pour aider"
-            : "Vous n'êtes plus disponible pour aider",
+          description: newAvailability === 'available'
+              ? "Vous êtes maintenant disponible pour aider"
+              : "Vous n'êtes plus disponible pour aider",
         });
       } else {
-        // Create new volunteer entry with default location
-        const { error: createError } = await supabase
-          .from('volunteers')
-          .insert({
-            user_id: user.id,
-            availability: 'available',
-            skills: [],
-            location: 'POINT(2.3488 48.8534)' // Default to Paris coordinates
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const { latitude, longitude } = position.coords;
+          const currentLocation = `POINT(${longitude} ${latitude})`;
+
+          const { error: createError } = await supabase
+              .from('volunteers')
+              .insert({
+                user_id: user.id,
+                availability: 'available',
+                skills: [],
+                location: `SRID=4326;${currentLocation}`, // Use current location
+              });
+
+          if (createError) throw createError;
+
+          setVolunteerStatus('available');
+          toast({
+            description: "Votre profil volontaire a été créé. Veuillez configurer vos compétences dans votre profil.",
           });
-
-        if (createError) throw createError;
-
-        setVolunteerStatus('available');
-        toast({
-          description: "Votre profil volontaire a été créé. Veuillez configurer vos compétences dans votre profil.",
+          navigate("/profile");
+        }, (error) => {
+          console.error('Error getting location:', error);
+          toast({
+            title: "Erreur de localisation",
+            description: "Impossible d'obtenir votre position actuelle.",
+            variant: "destructive"
+          });
         });
-        navigate("/profile"); // Redirect to profile to set up skills
       }
     } catch (error) {
       console.error('Error managing volunteer status:', error);

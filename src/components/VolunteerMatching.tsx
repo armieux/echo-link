@@ -59,12 +59,26 @@ async function fetchNearbyVolunteers(reportId: string) {
     .select('*')
     .in('id', volunteerIds);
 
-  // Merge data
-  return data.map(v => ({
-    ...volunteers?.find(vol => vol.id === v.volunteer_id),
-    distance_meters: v.distance_meters,
-    skill_match_percentage: v.skill_match_percentage,
-  }));
+  const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, username')
+      .in('id', volunteers?.map(v => v.user_id) || []);
+
+    if (!data || !volunteers || !profiles) {
+        throw new Error("Failed to fetch volunteers or profiles");
+    }
+
+  return data.map(v => {
+    const volunteer = volunteers?.find(vol => vol.id === v.volunteer_id);
+    const profile = profiles?.find(p => p.id === volunteer?.user_id);
+
+    return {
+      ...volunteer,
+      username: profile?.username || "Unknown",
+      distance_meters: v.distance_meters,
+      skill_match_percentage: v.skill_match_percentage,
+    };
+  });
 }
 
 const VolunteerMatching = ({ reportId }: { reportId: string }) => {
@@ -164,7 +178,7 @@ const VolunteerMatching = ({ reportId }: { reportId: string }) => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Toutes les compétences</SelectItem>
-              <SelectItem value="firstaid">Premiers secours</SelectItem>
+              <SelectItem value="premiers_secours">Premiers secours</SelectItem>
               <SelectItem value="mechanic">Mécanique</SelectItem>
               <SelectItem value="driving">Transport</SelectItem>
             </SelectContent>
@@ -206,7 +220,7 @@ const VolunteerMatching = ({ reportId }: { reportId: string }) => {
           >
             <div className="space-y-2 flex-1">
               <div className="flex items-center gap-2">
-                <h3 className="font-medium">Volontaire #{volunteer.id.slice(0, 8)}</h3>
+                <h3 className="font-medium">Volontaire {volunteer.username || '#'+volunteer.id.slice(0, 8)}</h3>
                 {volunteer.availability === 'available' && (
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                     <Check className="h-3 w-3 mr-1" />
@@ -241,7 +255,7 @@ const VolunteerMatching = ({ reportId }: { reportId: string }) => {
               className="w-full sm:w-auto"
               disabled={volunteer.availability !== 'available' || sendRequestMutation.isPending}
             >
-              Proposer de l'aide
+              Demander de l'aide
             </Button>
           </div>
         ))}
