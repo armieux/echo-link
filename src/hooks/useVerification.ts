@@ -10,7 +10,7 @@ export const useVerification = (user: User | null) => {
   const [selfie, setSelfie] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [verificationStatus, setVerificationStatus] = useState<"pending" | "verified" | "rejected">("pending");
+  const [verificationStatus, setVerificationStatus] = useState<null | "pending" | "verified" | "rejected">(null);
   const [verificationDoc, setVerificationDoc] = useState<VerificationDocument | null>(null);
 
   const fetchVerificationStatus = async () => {
