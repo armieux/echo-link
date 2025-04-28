@@ -1,0 +1,9 @@
+# docker-compose.yml
+version: '3.8'
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
