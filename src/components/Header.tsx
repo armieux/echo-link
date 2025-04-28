@@ -71,6 +71,13 @@ const Header = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="cursor-pointer"
+                  onClick={() => navigate("/volunteer-dashboard")}
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Espace Volontaire</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
                   onClick={handleSignOut}
                 >
                   <LogOut className="mr-2 h-4 w-4" />

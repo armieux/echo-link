@@ -86,7 +86,7 @@ const EmergencyForm = ({ onClose }: EmergencyFormProps) => {
         .insert({
           user_id: user.id,
           message: `Nouveau signalement: ${title}`,
-          type: 'report_created',
+          type: 'emergency  ',
           report_id: report.id,
           distance_meters: 0 // This will be calculated by the backend
         });

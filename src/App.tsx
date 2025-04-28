@@ -18,6 +18,7 @@ import RecoveryPosition from "./pages/resources/first-aid/RecoveryPosition";
 import CPR from "./pages/resources/first-aid/CPR";
 import BleedingControl from "./pages/resources/first-aid/BleedingControl";
 import Profile from "./pages/Profile";
+import VolunteerDashboard from "./pages/VolunteerDashboard";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,14 @@ const App = () => (
                     element={
                       <ProtectedRoute>
                         <Profile />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/volunteer-dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <VolunteerDashboard />
                       </ProtectedRoute>
                     }
                   />

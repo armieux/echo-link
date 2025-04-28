@@ -11,7 +11,8 @@ import {
 } from "./ui/select";
 import { useToast } from "./ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { AskForHelpButton } from "./AskForHelpButton";
 
 interface Volunteer {
   id: string;
@@ -92,32 +93,6 @@ const VolunteerMatching = ({ reportId }: { reportId: string }) => {
     queryFn: () => fetchNearbyVolunteers(reportId),
   });
 
-  const sendRequestMutation = useMutation({
-    mutationFn: async (volunteerId: string) => {
-      const { error } = await supabase
-        .from('volunteer_requests')
-        .insert({
-          report_id: reportId,
-          volunteer_id: volunteerId,
-        });
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({
-        title: "Succès",
-        description: "La demande d'aide a été envoyée au volontaire",
-      });
-    },
-    onError: () => {
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: "Impossible d'envoyer la demande d'aide",
-      });
-    },
-  });
-
   const handleSort = (option: SortOption) => {
     if (sortBy === option) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -127,9 +102,7 @@ const VolunteerMatching = ({ reportId }: { reportId: string }) => {
     }
   };
 
-  const handlePropose = (volunteerId: string) => {
-    sendRequestMutation.mutate(volunteerId);
-  };
+  // Retirer la gestion du dialogue qui est maintenant dans le composant AskForHelpButton
 
   if (isLoading) {
     return (
@@ -250,13 +223,12 @@ const VolunteerMatching = ({ reportId }: { reportId: string }) => {
               </div>
             </div>
 
-            <Button
-              onClick={() => handlePropose(volunteer.id)}
+            <AskForHelpButton
+              volunteerId={volunteer.id}
+              volunteerName={volunteer.username || `Volontaire #${volunteer.id.slice(0, 8)}`}
               className="w-full sm:w-auto"
-              disabled={volunteer.availability !== 'available' || sendRequestMutation.isPending}
-            >
-              Demander de l'aide
-            </Button>
+              disabled={volunteer.availability !== 'available'}
+            />
           </div>
         ))}
 
@@ -266,6 +238,8 @@ const VolunteerMatching = ({ reportId }: { reportId: string }) => {
           </div>
         )}
       </div>
+      
+      {/* Le dialogue est maintenant géré par le composant AskForHelpButton */}
     </div>
   );
 };
